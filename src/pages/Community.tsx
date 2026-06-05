@@ -113,7 +113,7 @@ export default function Community() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {studyGroups.map((group) => (
-              <div key={group.id} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-md transition-all">
+              <div key={group.id} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">{group.emoji}</div>
@@ -193,9 +193,9 @@ export default function Community() {
             <h2 className="text-3xl font-bold font-heading mb-3">Learning <span className="gradient-text">Challenges</span></h2>
             <p className="text-muted-foreground">Compete with peers and win exciting rewards while mastering your subjects</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {challenges.map((c, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-md transition-all text-center">
+              <div key={i} className="glass-card-premium rounded-3xl p-6 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 text-center flex flex-col h-full">
                 <div className="text-3xl mb-3">{c.icon}</div>
                 <h3 className="font-bold text-sm mb-2">{c.title}</h3>
                 <div className="text-xs text-muted-foreground mb-1"><Users className="w-3 h-3 inline mr-1" />{c.participants.toLocaleString()} participants</div>

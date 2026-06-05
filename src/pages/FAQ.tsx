@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
-import { ChevronDown, ChevronUp, Search, MessageCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, MessageCircle, BookOpen, Play, Users, FileText, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const faqData = [
@@ -91,7 +91,34 @@ export default function FAQ() {
         </div>
       </section>
 
-      <section className="pb-20">
+      {/* Quick Guides Grid */}
+      <section className="section-padding border-b border-border bg-muted/20">
+        <div className="container-custom">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-3">Popular <span className="gradient-text">Topics</span></h2>
+            <p className="text-muted-foreground">Jump straight to the most requested help guides.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Account & Profile", desc: "Manage your details", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
+              { title: "Course Enrollment", desc: "How to join classes", icon: BookOpen, color: "text-purple-500", bg: "bg-purple-500/10" },
+              { title: "Billing & Payments", desc: "Invoices & subscriptions", icon: FileText, color: "text-green-500", bg: "bg-green-500/10" },
+              { title: "Video Playback", desc: "Troubleshooting streams", icon: Play, color: "text-orange-500", bg: "bg-orange-500/10" },
+            ].map((topic, i) => (
+              <a key={i} href="#" className="glass-card-premium p-6 rounded-2xl text-center group hover:-translate-y-1 transition-all duration-300">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${topic.bg}`}>
+                  <topic.icon className={`w-6 h-6 ${topic.color}`} />
+                </div>
+                <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">{topic.title}</h3>
+                <p className="text-sm text-muted-foreground">{topic.desc}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Accordions */}
+      <section className="pt-20 pb-10">
         <div className="container-custom">
           {!search && (
             <div className="flex flex-wrap gap-2 justify-center mb-10">
@@ -136,9 +163,50 @@ export default function FAQ() {
               </div>
             )}
           </div>
+        </div>
+      </section>
 
-          {/* Contact CTA */}
-          <div className="max-w-2xl mx-auto mt-12">
+      {/* Video Tutorials Section */}
+      <section className="section-padding bg-card border-y border-border">
+        <div className="container-custom">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="badge-blue mb-4 inline-block">Learn Visually</span>
+              <h2 className="text-4xl font-bold mb-5">Video <span className="gradient-text">Tutorials</span></h2>
+              <p className="text-muted-foreground leading-relaxed mb-6 text-lg">
+                Prefer watching over reading? We've created short, step-by-step video tutorials covering everything from account setup to advanced course creation.
+              </p>
+              <ul className="space-y-4 mb-8">
+                {["Getting started as a student", "How to use the AI Study Assistant", "Teacher dashboard walkthrough", "Setting up your institution portal"].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Play className="w-3.5 h-3.5 text-secondary ml-0.5" />
+                    </div>
+                    <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/about" className="text-primary font-semibold hover:underline flex items-center gap-2">
+                Visit our YouTube Channel <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="relative aspect-video bg-muted rounded-3xl overflow-hidden border border-border group cursor-pointer shadow-lg">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10" />
+              <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Video tutorial thumbnail" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+                  <Play className="w-6 h-6 text-primary ml-1" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact CTA */}
+      <section className="section-padding">
+        <div className="container-custom">
+          <div className="max-w-2xl mx-auto">
             <div className="bg-gradient-to-br from-primary to-secondary rounded-2xl p-8 text-white text-center">
               <MessageCircle className="w-10 h-10 mx-auto mb-3" />
               <h3 className="text-xl font-bold mb-2">Still Have Questions?</h3>

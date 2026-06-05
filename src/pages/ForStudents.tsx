@@ -1,4 +1,6 @@
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
+import DemoModal from "@/components/features/DemoModal";
 import { Link } from "react-router-dom";
 import {
   GraduationCap, Brain, BookOpen, Target, Trophy, Users,
@@ -41,6 +43,8 @@ const testimonials = [
 ];
 
 export default function ForStudents() {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <Layout>
       {/* Hero */}
@@ -62,7 +66,7 @@ export default function ForStudents() {
                 <Link to="/register" className="px-8 py-4 gradient-primary text-white rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center gap-2 justify-center">
                   Start Learning Free <ArrowRight className="w-4 h-4" />
                 </Link>
-                <button onClick={() => toast.success("Opening demo walkthrough...")} className="px-8 py-4 border border-border rounded-xl font-bold hover:bg-muted transition-colors flex items-center gap-2 justify-center">
+                <button onClick={() => setShowDemo(true)} className="px-8 py-4 border border-border rounded-xl font-bold hover:bg-muted transition-colors flex items-center gap-2 justify-center">
                   <Play className="w-4 h-4 text-primary" /> Watch Demo
                 </button>
               </div>
@@ -106,7 +110,7 @@ export default function ForStudents() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg transition-all">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-4", colorMap[f.color])}>
                   <f.icon className="w-6 h-6" />
                 </div>
@@ -126,7 +130,7 @@ export default function ForStudents() {
           </div>
           <div className="space-y-4 max-w-3xl mx-auto">
             {journey.map((step, i) => (
-              <div key={i} className="flex items-start gap-5 bg-card border border-border rounded-2xl p-5">
+              <div key={i} className="flex items-start gap-6 glass-card-premium rounded-3xl p-6 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center text-white font-bold flex-shrink-0">{step.step}</div>
                 <div>
                   <h3 className="font-bold mb-1">{step.title}</h3>
@@ -146,7 +150,7 @@ export default function ForStudents() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:-translate-y-1 transition-transform duration-300">
                 <div className="flex items-center gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}</div>
                 <p className="text-sm text-muted-foreground mb-4">"{t.text}"</p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border">
@@ -204,6 +208,12 @@ export default function ForStudents() {
           </div>
         </div>
       </section>
+
+      <DemoModal
+        isOpen={showDemo}
+        onClose={() => setShowDemo(false)}
+        title="Student Platform Walkthrough Demo"
+      />
     </Layout>
   );
 }

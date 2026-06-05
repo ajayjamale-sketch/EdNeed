@@ -190,7 +190,7 @@ export default function Features() {
               <div
                 key={f.id}
                 id={f.id}
-                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all card-hover"
+                className="p-8 rounded-3xl glass-card-premium hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4 mb-5">
                   <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0", colorMap[f.color])}>
@@ -220,6 +220,61 @@ export default function Features() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security & Reliability Section */}
+      <section className="section-padding bg-muted/20 border-t border-border">
+        <div className="container-custom">
+          <div className="grid lg:grid-cols-2 gap-14 items-center">
+            <div>
+              <span className="badge-blue mb-4 inline-block">Enterprise-Grade</span>
+              <h2 className="text-4xl font-bold mb-5">Security & <span className="gradient-text">Reliability</span></h2>
+              <p className="text-muted-foreground leading-relaxed mb-6 text-lg">
+                Your data is safe with us. We employ military-grade encryption and comply with all global education data privacy regulations to ensure a secure learning environment.
+              </p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  "End-to-End Encryption for all communications",
+                  "GDPR & COPPA Compliant infrastructure",
+                  "99.9% Uptime SLA for uninterrupted learning",
+                  "Role-based access controls & audit logs"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/privacy" className="text-primary font-semibold hover:underline flex items-center gap-2">
+                Read our Privacy Policy <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-[2rem] blur-2xl" />
+              <div className="glass-card-premium p-8 rounded-[2rem] relative z-10 border border-white/20">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background/80 p-6 rounded-xl text-center border border-border">
+                    <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
+                    <div className="text-2xl font-bold">100%</div>
+                    <div className="text-xs text-muted-foreground mt-1">Data Encrypted</div>
+                  </div>
+                  <div className="bg-background/80 p-6 rounded-xl text-center border border-border">
+                    <Clock className="w-8 h-8 text-secondary mx-auto mb-3" />
+                    <div className="text-2xl font-bold">99.9%</div>
+                    <div className="text-xs text-muted-foreground mt-1">Uptime SLA</div>
+                  </div>
+                  <div className="bg-background/80 p-6 rounded-xl text-center border border-border col-span-2">
+                    <CheckCircle className="w-8 h-8 text-accent mx-auto mb-3" />
+                    <div className="text-2xl font-bold">ISO 27001</div>
+                    <div className="text-xs text-muted-foreground mt-1">Certified Infrastructure</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

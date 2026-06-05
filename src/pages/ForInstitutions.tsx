@@ -105,7 +105,7 @@ export default function ForInstitutions() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {institutionTypes.map((type, i) => (
-              <div key={i} onClick={() => toast.success(`Exploring ${type.title} features...`)} className="bg-card border border-border rounded-2xl p-5 text-center hover:border-primary/30 hover:shadow-md transition-all cursor-pointer">
+              <div key={i} onClick={() => toast.success(`Exploring ${type.title} features...`)} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
                 <div className="text-3xl mb-3">{type.emoji}</div>
                 <h3 className="font-bold mb-2">{type.title}</h3>
                 <p className="text-xs text-muted-foreground">{type.desc}</p>
@@ -124,7 +124,7 @@ export default function ForInstitutions() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg transition-all">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-4", colorMap[f.color])}>
                   <f.icon className="w-6 h-6" />
                 </div>
@@ -150,7 +150,7 @@ export default function ForInstitutions() {
               { step: "Day 3", icon: "🎓", title: "Staff Training", desc: "Live training sessions for teachers, admin staff, and management teams." },
               { step: "Go Live", icon: "🚀", title: "Launch & Support", desc: "Platform goes live with 24/7 dedicated support for the first 30 days." },
             ].map((s, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-5 text-center">
+              <div key={i} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/30 transition-colors">
                 <div className="text-2xl mb-2">{s.icon}</div>
                 <div className="text-xs font-bold text-primary mb-1">{s.step}</div>
                 <h3 className="font-bold mb-2">{s.title}</h3>
@@ -169,7 +169,7 @@ export default function ForInstitutions() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:-translate-y-1 transition-transform duration-300">
                 <div className="flex items-center gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}</div>
                 <p className="text-sm text-muted-foreground mb-4">"{t.text}"</p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border">

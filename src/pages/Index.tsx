@@ -5,14 +5,21 @@ import {
   GraduationCap, BookOpen, Users, BarChart3, Brain, Trophy, Star,
   ArrowRight, Play, CheckCircle, ChevronDown, ChevronUp, Zap, Target,
   Shield, Clock, Globe, Award, TrendingUp, MessageSquare, Briefcase,
-  Search, Filter, Heart, Eye
+  Search, Filter, Heart, Eye, MapPin, Building2
 } from "lucide-react";
 import heroImg from "@/assets/hero-illustration.png";
 import { cn } from "@/lib/utils";
+import DemoModal from "@/components/features/DemoModal";
 
 // ─── Hero Section ────────────────────────────────────────────────
 function HeroSection() {
   const [activeUsers] = useState(125000);
+  const [showDemo, setShowDemo] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("edneed-user")) setIsLoggedIn(true);
+  }, []);
 
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-8 pb-16">
@@ -54,19 +61,19 @@ function HeroSection() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <Link
-                to="/register"
+                to={isLoggedIn ? "/dashboard" : "/register"}
                 className="w-full sm:w-auto px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold text-base hover:opacity-90 transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 group"
               >
-                Start Learning Free
+                {isLoggedIn ? "Go to Dashboard" : "Start Learning Free"}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <Link
-                to="/features"
+              <button
+                onClick={() => setShowDemo(true)}
                 className="w-full sm:w-auto px-7 py-3.5 bg-background border border-border rounded-xl font-semibold text-base hover:bg-muted transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <Play className="w-4 h-4 text-primary" />
-                See How It Works
-              </Link>
+                Watch Demo
+              </button>
             </div>
 
             {/* Trust badges */}
@@ -121,6 +128,11 @@ function HeroSection() {
           </div>
         </div>
       </div>
+      <DemoModal
+        isOpen={showDemo}
+        onClose={() => setShowDemo(false)}
+        title="EdNeed Platform Walkthrough Demo"
+      />
     </section>
   );
 }
@@ -433,6 +445,74 @@ function DashboardPreviewSection() {
   );
 }
 
+// ─── Global Reach Section ─────────────────────────────────────────
+function GlobalReachSection() {
+  return (
+    <section className="section-padding bg-background border-t border-b border-border overflow-hidden">
+      <div className="container-custom">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
+          <div className="order-2 lg:order-1 relative">
+            <div className="relative aspect-square max-w-md mx-auto lg:mx-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full animate-pulse-slow" />
+              <div className="absolute inset-4 bg-card border border-border rounded-full glass-card-premium flex items-center justify-center p-8">
+                <div className="relative w-full h-full">
+                  <Globe className="absolute inset-0 w-full h-full text-primary/10" />
+                  {/* Floating dots representing institutions */}
+                  {[
+                    { top: "20%", left: "30%", delay: "0s" },
+                    { top: "40%", left: "70%", delay: "1s" },
+                    { top: "70%", left: "40%", delay: "2s" },
+                    { top: "50%", left: "20%", delay: "3s" },
+                    { top: "30%", left: "80%", delay: "0.5s" }
+                  ].map((pos, i) => (
+                    <div key={i} className="absolute w-3 h-3 bg-primary rounded-full animate-ping" style={{ top: pos.top, left: pos.left, animationDelay: pos.delay }} />
+                  ))}
+                  {[
+                    { top: "20%", left: "30%" },
+                    { top: "40%", left: "70%" },
+                    { top: "70%", left: "40%" },
+                    { top: "50%", left: "20%" },
+                    { top: "30%", left: "80%" }
+                  ].map((pos, i) => (
+                    <div key={i} className="absolute w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)]" style={{ top: pos.top, left: pos.left }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="order-1 lg:order-2">
+            <span className="badge-blue mb-4 inline-block">Global Network</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-5">
+              Trusted by <span className="gradient-text">Top Institutions</span> Worldwide
+            </h2>
+            <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+              EdNeed powers the digital infrastructure for schools, colleges, and educational organizations across the globe, ensuring uninterrupted and premium learning experiences.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-card">
+                <Building2 className="w-8 h-8 text-primary mb-2" />
+                <div className="text-3xl font-bold">500+</div>
+                <div className="text-sm text-muted-foreground">Partner Schools</div>
+              </div>
+              <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-card">
+                <MapPin className="w-8 h-8 text-secondary mb-2" />
+                <div className="text-3xl font-bold">12</div>
+                <div className="text-sm text-muted-foreground">Countries</div>
+              </div>
+            </div>
+            
+            <Link to="/about" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+              Read about our mission <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Testimonials Section ─────────────────────────────────────────
 const testimonials = [
   { name: "Priya Sharma", role: "Class 12 Student, CBSE", rating: 5, text: "EdNeed's AI study assistant helped me crack JEE with a 97 percentile! The personalized mock tests and concept explanations are absolutely amazing.", avatar: "PS" },
@@ -726,6 +806,7 @@ export default function Index() {
       <WorkflowSection />
       <BenefitsSection />
       <DashboardPreviewSection />
+      <GlobalReachSection />
       <TestimonialsSection />
       <PricingSection />
       <FAQSection />

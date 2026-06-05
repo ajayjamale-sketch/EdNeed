@@ -134,7 +134,7 @@ export default function Courses() {
       </section>
 
       {/* Course Grid */}
-      <section className="section-padding">
+      <section id="course-list-section" className="section-padding">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -157,7 +157,7 @@ export default function Courses() {
             {filtered.map((course) => (
               <div
                 key={course.id}
-                className="bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                className="glass-card-premium rounded-3xl overflow-hidden hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col h-full"
               >
                 <div className={cn("h-36 flex items-center justify-center relative", colorMap[course.color].split(" ").slice(0, 1).join(" ").replace("text-", "bg-").replace("-600", "-50").replace("bg-blue-50", "bg-blue-50").replace("bg-emerald-50", "bg-emerald-50"))}>
                   <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", colorMap[course.color])}>
@@ -221,7 +221,7 @@ export default function Courses() {
               { title: "Data Science Career Track", courses: 15, duration: "10 months", level: "Graduate", icon: "📊", color: "teal" },
               { title: "Communication & Soft Skills", courses: 8, duration: "4 months", level: "All Levels", icon: "🗣️", color: "indigo" },
             ].map((path, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer" onClick={() => toast.success(`Opening ${path.title} path...`)}>
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 cursor-pointer" onClick={() => toast.success(`Opening ${path.title} path...`)}>
                 <div className="text-3xl mb-3">{path.icon}</div>
                 <h3 className="font-bold mb-2">{path.title}</h3>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
@@ -265,7 +265,7 @@ export default function Courses() {
               { name: "Ms. Ananya Singh", subject: "UPSC / Polity", students: "9.8K", rating: 4.9, courses: 5 },
               { name: "Mr. Arjun Nair", subject: "Computer Science", students: "32K", rating: 4.7, courses: 10 },
             ].map((ins, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-5 text-center hover:border-primary/30 hover:shadow-md transition-all">
+              <div key={i} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-white text-xl font-bold mx-auto mb-3">{ins.name.charAt(0)}</div>
                 <h3 className="font-bold mb-0.5">{ins.name}</h3>
                 <p className="text-sm text-muted-foreground mb-3">{ins.subject}</p>
@@ -294,9 +294,12 @@ export default function Courses() {
                 <Link to="/register" className="px-8 py-4 bg-white text-primary rounded-xl font-bold hover:bg-white/90 transition-colors">
                   Get Started Free
                 </Link>
-                <Link to="/dashboard/marketplace" className="px-8 py-4 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition-colors border border-white/20">
+                <button
+                  onClick={() => document.getElementById("course-list-section")?.scrollIntoView({ behavior: "smooth" })}
+                  className="px-8 py-4 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition-colors border border-white/20"
+                >
                   Browse All Courses
-                </Link>
+                </button>
               </div>
             </div>
           </div>

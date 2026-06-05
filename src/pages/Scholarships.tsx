@@ -133,7 +133,7 @@ export default function Scholarships() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((opp) => (
-              <div key={opp.id} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-md transition-all flex flex-col">
+              <div key={opp.id} className="glass-card-premium rounded-3xl p-6 hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col group">
                 <div className="flex items-start justify-between mb-3">
                   <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", colorMap[opp.color])}>
                     {opp.category === "Scholarships" && <Award className="w-5 h-5" />}
@@ -206,7 +206,7 @@ export default function Scholarships() {
               { icon: "🌟", title: "Highlight Achievements", desc: "Include extracurricular activities, competitions won, community service, and leadership roles in your application.", tip: "Quantify your impact" },
               { icon: "📬", title: "Follow Up Professionally", desc: "Send a thank-you email after interviews and politely follow up on pending applications after the stated timeline.", tip: "Be professional always" },
             ].map((tip, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/20 transition-colors">
+              <div key={i} className="glass-card-premium rounded-2xl p-6 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
                 <div className="text-2xl mb-3">{tip.icon}</div>
                 <h3 className="font-bold mb-2">{tip.title}</h3>
                 <p className="text-sm text-muted-foreground mb-3">{tip.desc}</p>

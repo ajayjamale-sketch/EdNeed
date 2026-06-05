@@ -1,4 +1,6 @@
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
+import DemoModal from "@/components/features/DemoModal";
 import { Link } from "react-router-dom";
 import {
   BookOpen, DollarSign, Users, BarChart3, Video, Star,
@@ -41,6 +43,8 @@ const earnings = [
 ];
 
 export default function ForTeachers() {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <Layout>
       {/* Hero */}
@@ -62,7 +66,7 @@ export default function ForTeachers() {
                 <Link to="/register" className="px-8 py-4 gradient-primary text-white rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center gap-2 justify-center">
                   Start Teaching Free <ArrowRight className="w-4 h-4" />
                 </Link>
-                <button onClick={() => toast.success("Opening demo walkthrough...")} className="px-8 py-4 border border-border rounded-xl font-bold hover:bg-muted transition-colors flex items-center gap-2 justify-center">
+                <button onClick={() => setShowDemo(true)} className="px-8 py-4 border border-border rounded-xl font-bold hover:bg-muted transition-colors flex items-center gap-2 justify-center">
                   <Play className="w-4 h-4 text-primary" /> View Demo
                 </button>
               </div>
@@ -107,7 +111,7 @@ export default function ForTeachers() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg transition-all">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-4", colorMap[f.color])}>
                   <f.icon className="w-6 h-6" />
                 </div>
@@ -146,7 +150,7 @@ export default function ForTeachers() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {earnings.map((e, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 text-center hover:border-primary/30 transition-colors">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className="text-3xl font-bold gradient-text mb-2">{e.rate}</div>
                 <h3 className="font-bold mb-1">{e.type}</h3>
                 <p className="text-xs text-muted-foreground">{e.desc}</p>
@@ -169,7 +173,7 @@ export default function ForTeachers() {
               { name: "Ms. Kavitha Nair", subject: "English & Communication", earnings: "₹85K/month", text: "The course builder and live class tools are excellent. I started part-time and now teach full-time on EdNeed. The student base is huge and engagement is great.", initials: "KN" },
               { name: "Mr. Arjun Nair", subject: "Computer Science & DSA", earnings: "₹1.8L/month", text: "Teaching coding on EdNeed has been incredibly rewarding. The platform handles payments, student management, and analytics — I just focus on teaching.", initials: "AN" },
             ].map((t, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:-translate-y-1 transition-transform duration-300">
                 <div className="flex items-center gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}</div>
                 <p className="text-sm text-muted-foreground mb-4">"{t.text}"</p>
                 <div className="flex items-center justify-between pt-3 border-t border-border">
@@ -204,6 +208,13 @@ export default function ForTeachers() {
           </div>
         </div>
       </section>
+
+      <DemoModal
+        isOpen={showDemo}
+        onClose={() => setShowDemo(false)}
+        title="Teacher Platform Walkthrough Demo"
+        videoUrl="https://www.youtube.com/embed/9X5S53kF4nE"
+      />
     </Layout>
   );
 }

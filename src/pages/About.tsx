@@ -102,7 +102,7 @@ export default function About() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               {values.map((v, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors">
+                <div key={i} className="p-5 rounded-2xl glass-card-premium hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
                     <v.icon className="w-5 h-5 text-primary" />
                   </div>
@@ -154,10 +154,10 @@ export default function About() {
             <h2 className="text-4xl font-bold mb-4">Meet the Team <span className="gradient-text">Behind EdNeed</span></h2>
             <p className="text-muted-foreground">Passionate educators, technologists, and problem-solvers united by one mission.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((member, i) => (
-              <div key={i} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/20 transition-colors card-hover text-center">
-                <div className={`w-16 h-16 rounded-2xl ${member.bg} flex items-center justify-center text-white text-xl font-bold mx-auto mb-4`}>
+              <div key={i} className="p-8 rounded-3xl glass-card-premium hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden group">
+                <div className={`w-20 h-20 rounded-2xl ${member.bg} flex items-center justify-center text-white text-2xl font-bold mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   {member.initials}
                 </div>
                 <h3 className="font-semibold text-base mb-0.5">{member.name}</h3>

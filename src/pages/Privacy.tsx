@@ -90,6 +90,20 @@ export default function Privacy() {
         </div>
       </section>
 
+      {/* Trust & Compliance Badges */}
+      <section className="py-8 bg-muted/20 border-b border-border">
+        <div className="container-custom">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            {["GDPR Compliant", "COPPA Certified", "ISO 27001", "FERPA Compliant", "End-to-End Encrypted"].map((badge, i) => (
+              <div key={i} className="flex items-center gap-2 font-bold text-sm">
+                <Shield className="w-5 h-5 text-primary" />
+                {badge}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-14">
         <div className="container-custom">
           <div className="grid lg:grid-cols-4 gap-10">
@@ -156,6 +170,47 @@ export default function Privacy() {
                 <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Data Request CTA */}
+      <section className="section-padding bg-muted/20 border-t border-border">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <div className="glass-card-premium p-10 md:p-14 rounded-3xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+            <Database className="w-12 h-12 text-primary mx-auto mb-5" />
+            <h2 className="text-3xl font-bold mb-4">Control Your Data</h2>
+            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+              We believe your data belongs to you. You can request a full export of your data or ask for account deletion at any time.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button className="px-6 py-3 gradient-primary text-white rounded-xl font-semibold shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-transform">
+                Request Data Export
+              </button>
+              <button className="px-6 py-3 bg-destructive/10 text-destructive rounded-xl font-semibold hover:bg-destructive/20 transition-colors">
+                Request Deletion
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Policies */}
+      <section className="py-12 border-t border-border bg-background">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <h3 className="font-semibold mb-6">Related Legal Documents</h3>
+          <div className="flex flex-wrap justify-center gap-4">
+            {[
+              { name: "Terms of Service", path: "/terms" },
+              { name: "Cookies Policy", path: "/cookies" },
+              { name: "Accessibility Statement", path: "/accessibility" },
+              { name: "Community Guidelines", path: "/community" }
+            ].map((link, i) => (
+              <Link key={i} to={link.path} className="px-5 py-2.5 bg-card border border-border rounded-lg text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors">
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

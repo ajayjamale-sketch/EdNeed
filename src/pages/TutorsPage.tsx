@@ -115,7 +115,7 @@ export default function Tutors() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((tutor) => (
-              <div key={tutor.id} className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg transition-all">
+              <div key={tutor.id} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className="flex items-start gap-4 mb-4">
                   <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0", tutor.color)}>{tutor.initials}</div>
                   <div className="flex-1 min-w-0">
@@ -176,7 +176,7 @@ export default function Tutors() {
               { step: "03", icon: Calendar, title: "Schedule Sessions", desc: "Set up recurring sessions that fit your study timetable" },
               { step: "04", icon: Award, title: "Track Progress", desc: "Monitor improvement with detailed session reports and analytics" },
             ].map((step, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 text-center relative">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 text-center relative hover:border-primary/30 transition-colors">
                 <div className="absolute -top-3 left-6 text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">{step.step}</div>
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <step.icon className="w-5 h-5 text-primary" />
@@ -201,7 +201,7 @@ export default function Tutors() {
               { name: "Priya Mehta", grade: "NEET — Score: 710/720", text: "Dr. Priya's biology sessions were incredibly thorough. Her concept maps made everything so clear and easy to revise.", tutor: "Dr. Priya Sharma", initials: "PM" },
               { name: "Arjun Nair", grade: "UPSC CSE — Rank 89", text: "Ms. Ananya's polity notes and daily current affairs sessions were the backbone of my UPSC preparation.", tutor: "Ms. Ananya Singh", initials: "AN" },
             ].map((t, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:-translate-y-1 transition-transform duration-300">
                 <div className="flex items-center gap-1 mb-3">
                   {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                 </div>

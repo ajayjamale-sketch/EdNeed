@@ -13,6 +13,7 @@ import { ScrollToTopButton } from "@/components/features/ScrollToTop";
 import { useTheme } from "@/components/features/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 import { getMockUser, getRoleLabel, UserRole } from "@/hooks/useRole";
+import { useDashboardTab } from "@/pages/dashboard/DashboardContext";
 
 type NavItem = { icon: React.ElementType; label: string; href: string };
 
@@ -102,7 +103,6 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const [searchVal, setSearchVal] = useState("");
@@ -110,102 +110,85 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
   const navigate = useNavigate();
   const location = useLocation();
   const user = getMockUser();
-  const role = (user?.role as UserRole) || "student";
+  const rawRole = user?.role || "student";
+  const role = (typeof rawRole === 'string' ? rawRole.toLowerCase() : "student") as UserRole;
   const navItems = navByRole[role] || navByRole.student;
+  const { activeTab, setActiveTab } = useDashboardTab();
 
   const handleLogout = () => {
     localStorage.removeItem("edneed-user");
-    navigate("/role-select");
+    navigate("/");
   };
 
   const SidebarContent = () => (
     <>
       {/* Logo */}
-      <div className={cn("p-4 flex items-center gap-3 border-b border-border", collapsed && "justify-center")}>
+      <Link to="/" className="p-4 flex items-center gap-3 border-b border-border hover:opacity-90 transition-opacity">
         <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br", roleColors[role])}>
           <GraduationCap className="w-4 h-4 text-white" />
         </div>
-        {!collapsed && (
-          <span className="font-bold text-lg"><span className="gradient-text">Ed</span>Need</span>
-        )}
-      </div>
+        <span className="font-bold text-lg"><span className="gradient-text">Ed</span>Need</span>
+      </Link>
 
       {/* Role badge + User info */}
-      <div className={cn("p-4 border-b border-border", collapsed && "flex justify-center")}>
-        {!collapsed ? (
-          <div className="flex items-center gap-3">
-            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 bg-gradient-to-br", roleColors[role])}>
-              {user?.name?.charAt(0) || "U"}
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{user?.name}</p>
-              <p className="text-xs text-muted-foreground">{getRoleLabel(role)}</p>
-            </div>
-          </div>
-        ) : (
-          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br", roleColors[role])}>
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 bg-gradient-to-br", roleColors[role])}>
             {user?.name?.charAt(0) || "U"}
           </div>
-        )}
+          <div className="min-w-0">
+            <div className="font-semibold text-sm truncate">{user?.name || "User"}</div>
+            <div className="text-xs text-muted-foreground capitalize flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {getRoleLabel(role)}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.href ||
-            (item.href !== "/dashboard" && location.pathname.startsWith(item.href));
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar">
+        {navItems.map((item, index) => {
+          // Fallback parsing: if the link is exactly the dashboard root for the role, tab id is "overview"
+          let tabId = item.href.split("/").pop();
+          if (!tabId || tabId === "dashboard" || tabId === role) tabId = "overview";
+          
+          const isActive = activeTab === tabId;
+          
           return (
             <Link
-              key={item.href}
+              key={index}
               to={item.href}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                setActiveTab(tabId);
+                setMobileOpen(false);
+              }}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium",
-                collapsed && "justify-center",
-                isActive
-                  ? `bg-gradient-to-r ${roleColors[role]} text-white shadow-sm`
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                "w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
+                isActive 
+                  ? cn("bg-gradient-to-r text-white shadow-md shadow-primary/20", roleColors[role].replace("to-", "to-").split(" ")[0], roleColors[role].split(" ")[1])
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
-              title={collapsed ? item.label : undefined}
             >
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && item.label}
+              <item.icon className={cn("w-4.5 h-4.5 flex-shrink-0 transition-transform group-hover:scale-110", isActive ? "text-white" : "text-muted-foreground group-hover:text-primary")} />
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Role switch + bottom actions */}
-      <div className="p-3 border-t border-border space-y-0.5">
-        {!collapsed && (
-          <Link
-            to="/role-select"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-primary bg-primary/5 hover:bg-primary/10 transition-colors mb-1"
-          >
-            <Users className="w-4 h-4 flex-shrink-0" />
-            Switch Role / Dashboard
-          </Link>
-        )}
-        <Link
-          to="/"
-          className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all", collapsed && "justify-center")}
-        >
-          <Home className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && "Home"}
-        </Link>
-        <Link
-          to="/settings"
-          className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all", collapsed && "justify-center")}
-        >
+      {/* Bottom Actions */}
+      <div className="p-3 border-t border-border space-y-1">
+        <Link to="/settings" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
           <Settings className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && "Settings"}
+          <span>Settings</span>
         </Link>
         <button
           onClick={handleLogout}
-          className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all", collapsed && "justify-center")}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && "Sign out"}
+          <span>Sign out</span>
         </button>
       </div>
     </>
@@ -214,14 +197,8 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
   return (
     <div className="min-h-screen flex bg-background">
       {/* Desktop Sidebar */}
-      <aside className={cn("hidden lg:flex flex-col h-screen sticky top-0 bg-sidebar border-r border-border transition-all duration-300 flex-shrink-0", collapsed ? "w-[68px]" : "w-60")}>
+      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-sidebar border-r border-border transition-all duration-300 flex-shrink-0 w-60">
         <SidebarContent />
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3.5 top-20 w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center shadow-sm hover:bg-muted transition-colors z-10"
-        >
-          {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
-        </button>
       </aside>
 
       {/* Mobile sidebar overlay */}

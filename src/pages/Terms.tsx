@@ -95,6 +95,25 @@ export default function Terms() {
         </div>
       </section>
 
+      {/* Code of Conduct Highlights */}
+      <section className="py-8 bg-muted/20 border-b border-border">
+        <div className="container-custom">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+            {[
+              { icon: BookOpen, text: "Learn Respectfully" },
+              { icon: Shield, text: "Protect Integrity" },
+              { icon: Scale, text: "Follow Guidelines" },
+              { icon: Users, text: "Foster Community" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2 font-bold text-sm text-muted-foreground hover:text-primary transition-colors">
+                <item.icon className="w-5 h-5 text-primary" />
+                {item.text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-14">
         <div className="container-custom">
           <div className="grid lg:grid-cols-4 gap-10">
@@ -161,6 +180,47 @@ export default function Terms() {
                 <Link to="/contact" className="text-primary hover:underline">Contact Us</Link>
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Action CTA */}
+      <section className="section-padding bg-muted/20 border-t border-border">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <div className="glass-card-premium p-10 md:p-14 rounded-3xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-5" />
+            <h2 className="text-3xl font-bold mb-4">Report a Violation</h2>
+            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+              Notice something that violates our Terms of Service? Help us maintain a safe learning environment by reporting it to our moderation team.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/contact" className="px-6 py-3 gradient-primary text-white rounded-xl font-semibold shadow-md hover:-translate-y-0.5 transition-transform">
+                Report Issue
+              </Link>
+              <a href="mailto:legal@edneed.com" className="px-6 py-3 bg-card border border-border text-foreground rounded-xl font-semibold hover:bg-muted transition-colors">
+                Contact Legal Team
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Policies */}
+      <section className="py-12 border-t border-border bg-background">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <h3 className="font-semibold mb-6">Related Legal Documents</h3>
+          <div className="flex flex-wrap justify-center gap-4">
+            {[
+              { name: "Privacy Policy", path: "/privacy" },
+              { name: "Cookies Policy", path: "/cookies" },
+              { name: "Accessibility Statement", path: "/accessibility" },
+              { name: "Community Guidelines", path: "/community" }
+            ].map((link, i) => (
+              <Link key={i} to={link.path} className="px-5 py-2.5 bg-card border border-border rounded-lg text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors">
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

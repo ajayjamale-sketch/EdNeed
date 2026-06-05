@@ -122,7 +122,7 @@ export default function Career() {
               <div
                 key={i}
                 onClick={() => toast.success(`Opening ${career.title} career path...`)}
-                className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg transition-all cursor-pointer group"
+                className="glass-card-premium p-8 rounded-3xl hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
               >
                 <div className="text-3xl mb-3">{career.icon}</div>
                 <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{career.title}</h3>
@@ -161,7 +161,7 @@ export default function Career() {
               { step: "03", icon: BookOpen, title: "College Guidance", desc: "Get expert guidance on college selection, entrance exams, and application processes" },
               { step: "04", icon: Briefcase, title: "Connect & Succeed", desc: "Connect with industry mentors, apply for internships, and launch your career" },
             ].map((step, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 relative">
+              <div key={i} className="glass-card-premium rounded-3xl p-8 relative hover:-translate-y-1 transition-transform duration-300">
                 <div className="absolute -top-3 left-6 text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">{step.step}</div>
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                   <step.icon className="w-5 h-5 text-primary" />

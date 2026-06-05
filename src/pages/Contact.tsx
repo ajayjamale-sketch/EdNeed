@@ -224,6 +224,60 @@ export default function Contact() {
           </div>
         </div>
       </section>
+
+      {/* Global Offices */}
+      <section className="section-padding bg-muted/20 border-t border-border">
+        <div className="container-custom">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="badge-blue mb-4 inline-block">Our Locations</span>
+            <h2 className="text-3xl font-bold mb-4">Visit Our <span className="gradient-text">Global Offices</span></h2>
+            <p className="text-muted-foreground">We have dedicated support and engineering centers around the world to serve our community.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { city: "Bangalore", type: "Global HQ", address: "4th Floor, Tech Park, Whitefield, Bangalore, Karnataka 560066", phone: "+91 80 4000 0000" },
+              { city: "New Delhi", type: "North Hub", address: "Sector 62, Cyber City, Gurugram, NCR 122001", phone: "+91 11 4100 0000" },
+              { city: "Mumbai", type: "Business Center", address: "BKC Commercial Complex, Bandra East, Mumbai 400051", phone: "+91 22 2600 0000" }
+            ].map((office, i) => (
+              <div key={i} className="glass-card-premium p-6 rounded-2xl text-center group hover:-translate-y-1 transition-all duration-300">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <MapPin className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold mb-1">{office.city}</h3>
+                <p className="text-xs font-semibold text-primary mb-3">{office.type}</p>
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{office.address}</p>
+                <p className="text-sm font-medium text-foreground">{office.phone}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick FAQ Snippet */}
+      <section className="section-padding">
+        <div className="container-custom">
+          <div className="bg-card border border-border rounded-3xl p-8 md:p-12 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="max-w-xl">
+                <h2 className="text-3xl font-bold mb-4">Still have questions?</h2>
+                <p className="text-muted-foreground mb-6 text-lg">Browse our comprehensive Help Center or read our Frequently Asked Questions for instant answers.</p>
+                <a href="/faq" className="inline-flex items-center gap-2 px-6 py-3 border border-border hover:border-primary/50 hover:bg-primary/5 bg-background rounded-xl font-semibold transition-all">
+                  Visit Help Center <ArrowRight className="w-4 h-4 text-primary" />
+                </a>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
+                {["Account Recovery", "Billing & Subscriptions", "Course Enrollment", "Technical Support"].map((topic, i) => (
+                  <a key={i} href="/faq" className="glass-card-premium p-4 rounded-xl text-sm font-medium hover:text-primary transition-colors flex items-center justify-between group">
+                    {topic}
+                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 }

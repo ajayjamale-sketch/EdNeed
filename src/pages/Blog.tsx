@@ -120,7 +120,7 @@ export default function Blog() {
                 <Link
                   key={post.slug}
                   to={`/blog/${post.slug}`}
-                  className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/30 transition-all card-hover"
+                  className="group glass-card-premium rounded-3xl overflow-hidden hover:border-primary/40 hover:-translate-y-2 transition-all duration-300"
                 >
                   {/* Color header */}
                   <div className="h-36 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 flex items-center justify-center">
@@ -155,7 +155,8 @@ export default function Blog() {
           )}
 
           {/* Newsletter CTA */}
-          <div className="mt-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-2xl p-8 md:p-10 text-center border border-border">
+          <div className="mt-16 glass-card-premium rounded-3xl p-10 md:p-14 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
             <Star className="w-8 h-8 text-primary mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">Stay Updated</h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm">Get weekly articles on study tips, exam strategies, and educational insights directly to your inbox.</p>

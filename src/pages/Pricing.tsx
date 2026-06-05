@@ -133,9 +133,9 @@ export default function Pricing() {
               <div
                 key={i}
                 className={cn(
-                  "rounded-2xl border p-6 relative flex flex-col transition-all",
+                  "rounded-3xl border p-8 relative flex flex-col transition-all duration-300",
                   plan.popular
-                    ? "gradient-primary text-white border-transparent shadow-2xl shadow-primary/25 xl:scale-[1.03]"
+                    ? "glass-card-premium border-primary/50 shadow-2xl shadow-primary/25 xl:scale-[1.03] z-10"
                     : "bg-card border-border hover:border-primary/30 card-hover"
                 )}
               >
@@ -200,6 +200,45 @@ export default function Pricing() {
                 <Icon className="w-4 h-4 text-primary" />{text}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Comparison Table */}
+      <section className="section-padding hidden md:block">
+        <div className="container-custom max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">Compare <span className="gradient-text">Features</span></h2>
+            <p className="text-muted-foreground">A detailed breakdown of everything included in our plans.</p>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+              <thead className="bg-muted/30">
+                <tr>
+                  <th className="py-4 px-6 font-semibold text-muted-foreground border-b border-border w-1/3">Features</th>
+                  <th className="py-4 px-6 font-semibold text-center border-b border-border">Free</th>
+                  <th className="py-4 px-6 font-semibold text-center border-b border-border text-primary">Pro</th>
+                  <th className="py-4 px-6 font-semibold text-center border-b border-border text-purple-600">Educator</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {[
+                  { name: "Course Access", free: "5 Courses", pro: "Unlimited", edu: "Unlimited + Publish" },
+                  { name: "AI Study Assistant", free: "10 queries/day", pro: "Unlimited", edu: "Unlimited" },
+                  { name: "Live Classes", free: "View Only", pro: "View + Participate", edu: "Host & Manage" },
+                  { name: "Certificates", free: "-", pro: "Included", edu: "Custom Branded" },
+                  { name: "Analytics Dashboard", free: "Basic", pro: "Advanced", edu: "Revenue + Advanced" },
+                ].map((row, i) => (
+                  <tr key={i} className="hover:bg-muted/30 transition-colors">
+                    <td className="py-4 px-6 border-b border-border font-medium">{row.name}</td>
+                    <td className="py-4 px-6 border-b border-border text-center text-muted-foreground">{row.free}</td>
+                    <td className="py-4 px-6 border-b border-border text-center font-medium">{row.pro}</td>
+                    <td className="py-4 px-6 border-b border-border text-center font-medium">{row.edu}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
