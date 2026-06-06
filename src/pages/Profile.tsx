@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Camera, CheckCircle, Edit2, Save, X } from "lucide-react";
+import { Camera, CheckCircle, Edit2, Save, X, Flame, Zap, Target, Trophy, BookOpen, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -42,12 +42,12 @@ export default function Profile() {
   };
 
   const achievements = [
-    { emoji: "🔥", title: "7-Day Streak", date: "June 2025" },
-    { emoji: "⚡", title: "Fast Learner", date: "May 2025" },
-    { emoji: "🎯", title: "Perfect Score", date: "April 2025" },
-    { emoji: "🏆", title: "Top 10%", date: "March 2025" },
-    { emoji: "📚", title: "Course Completed", date: "Feb 2025" },
-    { emoji: "💡", title: "Problem Solver", date: "Jan 2025" },
+    { icon: Flame, title: "7-Day Streak", date: "June 2025", color: "text-orange-500 bg-orange-50 dark:bg-orange-950/30" },
+    { icon: Zap, title: "Fast Learner", date: "May 2025", color: "text-yellow-500 bg-yellow-50 dark:bg-yellow-950/30" },
+    { icon: Target, title: "Perfect Score", date: "April 2025", color: "text-blue-500 bg-blue-50 dark:bg-blue-950/30" },
+    { icon: Trophy, title: "Top 10%", date: "March 2025", color: "text-yellow-600 bg-yellow-50 dark:bg-yellow-950/30" },
+    { icon: BookOpen, title: "Course Completed", date: "Feb 2025", color: "text-green-500 bg-green-50 dark:bg-green-950/30" },
+    { icon: Lightbulb, title: "Problem Solver", date: "Jan 2025", color: "text-purple-500 bg-purple-50 dark:bg-purple-950/30" },
   ];
 
   const stats = [
@@ -108,16 +108,21 @@ export default function Profile() {
           <div className="bg-card border border-border rounded-2xl p-5">
             <h3 className="font-semibold mb-4">Achievements</h3>
             <div className="space-y-3">
-              {achievements.map((a, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="text-xl">{a.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{a.title}</div>
-                    <div className="text-xs text-muted-foreground">{a.date}</div>
+              {achievements.map((a, i) => {
+                const Icon = a.icon;
+                return (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0", a.color)}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{a.title}</div>
+                      <div className="text-xs text-muted-foreground">{a.date}</div>
+                    </div>
+                    <CheckCircle className="w-4 h-4 text-accent flex-shrink-0" />
                   </div>
-                  <CheckCircle className="w-4 h-4 text-accent flex-shrink-0" />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

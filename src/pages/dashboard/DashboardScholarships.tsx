@@ -1,18 +1,18 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Star, Calendar, Clock, DollarSign, Search, Filter, BookOpen, Globe, Trophy, Briefcase, CheckCircle, ArrowRight, Bell, ExternalLink } from "lucide-react";
+import { Star, Calendar, Clock, DollarSign, Search, Filter, BookOpen, Globe, Trophy, Briefcase, CheckCircle, ArrowRight, Bell, ExternalLink, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const scholarships = [
-  { id: 1, type: "Scholarship", icon: "🎓", title: "National Merit Scholarship", org: "Ministry of Education, India", amount: "₹1,20,000/year", deadline: "Jul 31, 2025", eligibility: "Class 10 pass with 80%+", category: "Government", difficulty: "Competitive", applied: false, saved: false },
-  { id: 2, type: "Scholarship", icon: "🌟", title: "INSPIRE Scholarship", org: "DST, Government of India", amount: "₹80,000/year", deadline: "Aug 15, 2025", eligibility: "Top 1% in Class 12, Science stream", category: "Government", difficulty: "Very Competitive", applied: true, saved: true },
-  { id: 3, type: "Internship", icon: "💼", title: "Summer Research Internship", org: "IIT Delhi", amount: "₹15,000/month + accommodation", deadline: "Jun 30, 2025", eligibility: "B.Tech/BSc students, CGPA 8.0+", category: "Research", difficulty: "Competitive", applied: false, saved: true },
-  { id: 4, type: "Competition", icon: "🏆", title: "National Science Olympiad", org: "Science Olympiad Foundation", amount: "₹50,000 + Gold Medal", deadline: "Sep 10, 2025", eligibility: "Class 1-12 students", category: "Olympiad", difficulty: "Open", applied: false, saved: false },
-  { id: 5, type: "Scholarship", icon: "💰", title: "Tata Scholarship for Higher Education", org: "Tata Trusts", amount: "Full tuition + stipend", deadline: "Oct 1, 2025", eligibility: "Family income < ₹5 LPA, merit-based", category: "Corporate", difficulty: "Competitive", applied: false, saved: false },
-  { id: 6, type: "Internship", icon: "🚀", title: "Google Student Developer Program", org: "Google India", amount: "₹25,000/month", deadline: "Jul 20, 2025", eligibility: "CS/IT students, coding skills required", category: "Tech", difficulty: "Very Competitive", applied: false, saved: false },
-  { id: 7, type: "Fellowship", icon: "🌍", title: "Fulbright-Nehru Study Abroad", org: "US-India Educational Foundation", amount: "Full scholarship to USA", deadline: "Nov 15, 2025", eligibility: "Indian citizens, postgraduate level", category: "Study Abroad", difficulty: "Highly Competitive", applied: false, saved: false },
-  { id: 8, type: "Competition", icon: "🧮", title: "International Mathematics Olympiad", org: "IMO Foundation", amount: "Gold/Silver/Bronze Medals + Recognition", deadline: "Aug 31, 2025", eligibility: "Class 9-12 students", category: "Olympiad", difficulty: "Highly Competitive", applied: false, saved: false },
+  { id: 1, type: "Scholarship", icon: Award, title: "National Merit Scholarship", org: "Ministry of Education, India", amount: "₹1,20,000/year", deadline: "Jul 31, 2025", eligibility: "Class 10 pass with 80%+", category: "Government", difficulty: "Competitive", applied: false, saved: false },
+  { id: 2, type: "Scholarship", icon: Star, title: "INSPIRE Scholarship", org: "DST, Government of India", amount: "₹80,000/year", deadline: "Aug 15, 2025", eligibility: "Top 1% in Class 12, Science stream", category: "Government", difficulty: "Very Competitive", applied: true, saved: true },
+  { id: 3, type: "Internship", icon: Briefcase, title: "Summer Research Internship", org: "IIT Delhi", amount: "₹15,000/month + accommodation", deadline: "Jun 30, 2025", eligibility: "B.Tech/BSc students, CGPA 8.0+", category: "Research", difficulty: "Competitive", applied: false, saved: true },
+  { id: 4, type: "Competition", icon: Trophy, title: "National Science Olympiad", org: "Science Olympiad Foundation", amount: "₹50,000 + Gold Medal", deadline: "Sep 10, 2025", eligibility: "Class 1-12 students", category: "Olympiad", difficulty: "Open", applied: false, saved: false },
+  { id: 5, type: "Scholarship", icon: DollarSign, title: "Tata Scholarship for Higher Education", org: "Tata Trusts", amount: "Full tuition + stipend", deadline: "Oct 1, 2025", eligibility: "Family income < ₹5 LPA, merit-based", category: "Corporate", difficulty: "Competitive", applied: false, saved: false },
+  { id: 6, type: "Internship", icon: Briefcase, title: "Google Student Developer Program", org: "Google India", amount: "₹25,000/month", deadline: "Jul 20, 2025", eligibility: "CS/IT students, coding skills required", category: "Tech", difficulty: "Very Competitive", applied: false, saved: false },
+  { id: 7, type: "Fellowship", icon: Globe, title: "Fulbright-Nehru Study Abroad", org: "US-India Educational Foundation", amount: "Full scholarship to USA", deadline: "Nov 15, 2025", eligibility: "Indian citizens, postgraduate level", category: "Study Abroad", difficulty: "Highly Competitive", applied: false, saved: false },
+  { id: 8, type: "Competition", icon: Trophy, title: "International Mathematics Olympiad", org: "IMO Foundation", amount: "Gold/Silver/Bronze Medals + Recognition", deadline: "Aug 31, 2025", eligibility: "Class 9-12 students", category: "Olympiad", difficulty: "Highly Competitive", applied: false, saved: false },
 ];
 
 const typeColor: Record<string, string> = {
@@ -144,7 +144,9 @@ export default function DashboardScholarships() {
               <div key={item.id} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/30 transition-all card-hover">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{item.icon}</span>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <item.icon className="w-4 h-4 text-primary" />
+                    </div>
                     <span className={cn("text-xs font-bold px-2.5 py-0.5 rounded-full", typeColor[item.type])}>
                       {item.type}
                     </span>

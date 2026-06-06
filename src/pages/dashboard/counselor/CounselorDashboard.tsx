@@ -33,7 +33,7 @@ export default function CounselorDashboard() {
           { label: "Active Students", val: "42", icon: Users, color: "text-blue-500 bg-blue-50 dark:bg-blue-950" },
           { label: "Sessions This Month", val: "20", icon: Calendar, color: "text-purple-500 bg-purple-50 dark:bg-purple-950" },
           { label: "Assessments Done", val: "128", icon: Target, color: "text-accent bg-accent/10" },
-          { label: "Avg. Rating", val: "4.9 ⭐", icon: Star, color: "text-yellow-500 bg-yellow-50 dark:bg-yellow-950" },
+          { label: "Avg. Rating", val: "4.9", icon: Star, color: "text-yellow-500 bg-yellow-50 dark:bg-yellow-950" },
         ].map((s, i) => (
           <div key={i} className="bg-card border border-border rounded-2xl p-5">
             <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center mb-3", s.color.split(" ").slice(1).join(" "))}>

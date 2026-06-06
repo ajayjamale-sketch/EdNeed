@@ -72,7 +72,7 @@ export default function TeacherAnalytics() {
                 <div className="font-semibold text-sm">{c.course}</div>
                 <div className="flex gap-4 text-xs text-muted-foreground mt-0.5">
                   <span>Completion: {c.completion}%</span>
-                  <span>Rating: {c.rating} ⭐</span>
+                  <span>Rating: {c.rating}</span>
                   <span className="text-destructive">Drop-off: {c.dropoff}%</span>
                 </div>
                 <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden mt-1.5">

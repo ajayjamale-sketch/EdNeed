@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GraduationCap, Eye, EyeOff, ArrowRight, CheckCircle, BookOpen, Brain, Trophy } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, ArrowRight, CheckCircle, BookOpen, Brain, Trophy, User, AlertCircle } from "lucide-react";
 import { useTheme } from "@/components/features/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
@@ -149,7 +149,7 @@ export default function Login() {
               onClick={handleDemoLogin}
               className="w-full flex items-center justify-center gap-2 py-3 border border-border rounded-xl text-sm font-semibold hover:bg-muted transition-colors mb-6"
             >
-              <span className="text-lg">👤</span>
+              <User className="w-4 h-4 text-muted-foreground" />
               Try Demo (Select Your Role)
             </button>
 
@@ -201,7 +201,7 @@ export default function Login() {
                     placeholder="you@example.com"
                     className={`w-full px-4 py-3 border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all ${errors.email ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
                   />
-                  {errors.email && <p className="mt-1.5 text-xs text-destructive flex items-center gap-1"><span>⚠</span> {errors.email}</p>}
+                  {errors.email && <p className="mt-1.5 text-xs text-destructive flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> {errors.email}</p>}
                 </div>
 
                 <div>
@@ -222,7 +222,7 @@ export default function Login() {
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.password && <p className="mt-1.5 text-xs text-destructive flex items-center gap-1"><span>⚠</span> {errors.password}</p>}
+                  {errors.password && <p className="mt-1.5 text-xs text-destructive flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> {errors.password}</p>}
                   <div className="flex justify-end mt-2">
                     <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">Forgot password?</Link>
                   </div>

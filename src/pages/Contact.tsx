@@ -207,13 +207,7 @@ export default function Contact() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white">
-                <h3 className="font-semibold mb-2">Book a Free Demo</h3>
-                <p className="text-white/75 text-sm mb-4">See EdNeed in action. Our team will walk you through the platform tailored to your institution's needs.</p>
-                <button className="w-full py-2.5 bg-white text-primary rounded-xl text-sm font-semibold hover:bg-white/90 transition-colors">
-                  Schedule Demo →
-                </button>
-              </div>
+
 
               <div className="bg-card border border-border rounded-2xl p-5">
                 <p className="text-sm text-muted-foreground leading-relaxed">

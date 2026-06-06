@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import {
   Building2, Users, BarChart3, Calendar, DollarSign, MessageSquare,
   CheckCircle, ArrowRight, Shield, FileText, TrendingUp, Bell,
-  Zap, Star, Globe, BookOpen, Award
+  Zap, Star, Globe, BookOpen, Award, School, Landmark, GraduationCap,
+  ClipboardList, Wrench, Rocket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -27,10 +28,10 @@ const colorMap: Record<string, string> = {
 };
 
 const institutionTypes = [
-  { emoji: "🏫", title: "K-12 Schools", desc: "Complete school management from Class 1 to Class 12 including all CBSE, ICSE, and State Board requirements." },
-  { emoji: "🏛️", title: "Colleges & Universities", desc: "Higher education management with course registration, exam management, and student placement tracking." },
-  { emoji: "📚", title: "Coaching Institutes", desc: "Specialized tools for JEE, NEET, UPSC, and other competitive exam coaching centers." },
-  { emoji: "🎓", title: "Skill Development Centers", desc: "Vocational training and skill development program management with certification tracking." },
+  { icon: School, title: "K-12 Schools", desc: "Complete school management from Class 1 to Class 12 including all CBSE, ICSE, and State Board requirements." },
+  { icon: Landmark, title: "Colleges & Universities", desc: "Higher education management with course registration, exam management, and student placement tracking." },
+  { icon: BookOpen, title: "Coaching Institutes", desc: "Specialized tools for JEE, NEET, UPSC, and other competitive exam coaching centers." },
+  { icon: GraduationCap, title: "Skill Development Centers", desc: "Vocational training and skill development program management with certification tracking." },
 ];
 
 const testimonials = [
@@ -103,14 +104,19 @@ export default function ForInstitutions() {
             <h2 className="text-3xl font-bold font-heading mb-3">Built for <span className="gradient-text">Every Institution</span></h2>
             <p className="text-muted-foreground">Tailored solutions for every type of educational institution</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {institutionTypes.map((type, i) => (
-              <div key={i} onClick={() => toast.success(`Exploring ${type.title} features...`)} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                <div className="text-3xl mb-3">{type.emoji}</div>
-                <h3 className="font-bold mb-2">{type.title}</h3>
-                <p className="text-xs text-muted-foreground">{type.desc}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {institutionTypes.map((type, i) => {
+              const Icon = type.icon;
+              return (
+                <div key={i} onClick={() => toast.success(`Exploring ${type.title} features...`)} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-bold mb-2">{type.title}</h3>
+                  <p className="text-xs text-muted-foreground">{type.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -145,18 +151,23 @@ export default function ForInstitutions() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { step: "Day 1", icon: "📋", title: "Onboarding Call", desc: "Dedicated onboarding manager reviews your requirements and customizes the platform." },
-              { step: "Day 2", icon: "🔧", title: "Data Migration", desc: "Import existing student, teacher, and fee data with our assisted bulk import tools." },
-              { step: "Day 3", icon: "🎓", title: "Staff Training", desc: "Live training sessions for teachers, admin staff, and management teams." },
-              { step: "Go Live", icon: "🚀", title: "Launch & Support", desc: "Platform goes live with 24/7 dedicated support for the first 30 days." },
-            ].map((s, i) => (
-              <div key={i} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/30 transition-colors">
-                <div className="text-2xl mb-2">{s.icon}</div>
-                <div className="text-xs font-bold text-primary mb-1">{s.step}</div>
-                <h3 className="font-bold mb-2">{s.title}</h3>
-                <p className="text-xs text-muted-foreground">{s.desc}</p>
-              </div>
-            ))}
+              { step: "Day 1", icon: ClipboardList, title: "Onboarding Call", desc: "Dedicated onboarding manager reviews your requirements and customizes the platform." },
+              { step: "Day 2", icon: Wrench, title: "Data Migration", desc: "Import existing student, teacher, and fee data with our assisted bulk import tools." },
+              { step: "Day 3", icon: GraduationCap, title: "Staff Training", desc: "Live training sessions for teachers, admin staff, and management teams." },
+              { step: "Go Live", icon: Rocket, title: "Launch & Support", desc: "Platform goes live with 24/7 dedicated support for the first 30 days." },
+            ].map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/30 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-xs font-bold text-primary mb-1">{s.step}</div>
+                  <h3 className="font-bold mb-2">{s.title}</h3>
+                  <p className="text-xs text-muted-foreground">{s.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

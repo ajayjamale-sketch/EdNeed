@@ -118,8 +118,8 @@ function HeroSection() {
             <div className="absolute -left-6 bottom-20 glass-card rounded-xl p-3.5 shadow-lg animate-float">
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {["🧑‍🎓", "👩‍🏫", "👨‍💼"].map((e, i) => (
-                    <div key={i} className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs border border-background">{e}</div>
+                  {["S", "T", "P"].map((initial, i) => (
+                    <div key={i} className="w-6 h-6 rounded-full bg-primary text-white font-bold flex items-center justify-center text-[10px] border border-background">{initial}</div>
                   ))}
                 </div>
                 <span className="text-xs font-medium">+2K joined today</span>
@@ -250,25 +250,25 @@ function WorkflowSection() {
 const userTypes = [
   {
     role: "Students",
-    emoji: "🧑‍🎓",
+    icon: GraduationCap,
     benefits: ["AI-powered personalized learning", "24/7 doubt solving assistant", "Mock tests & analytics", "Career guidance & counseling", "Scholarship discovery"],
     color: "blue",
   },
   {
     role: "Teachers",
-    emoji: "👩‍🏫",
+    icon: BookOpen,
     benefits: ["Publish & monetize courses", "Live & recorded classes", "Student performance insights", "Revenue dashboard", "Global reach"],
     color: "purple",
   },
   {
     role: "Parents",
-    emoji: "👨‍👩‍👧",
+    icon: Users,
     benefits: ["Real-time progress monitoring", "Attendance & result tracking", "Teacher communication", "Safe learning environment", "Goal tracking"],
     color: "green",
   },
   {
     role: "Institutions",
-    emoji: "🏫",
+    icon: Building2,
     benefits: ["Student & attendance management", "Timetable & fee management", "Academic reports", "Parent communication portal", "Analytics dashboard"],
     color: "orange",
   },
@@ -292,20 +292,23 @@ function BenefitsSection() {
 
         {/* Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {userTypes.map((u, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
-              className={cn(
-                "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border",
-                active === i
-                  ? "gradient-primary text-white border-transparent shadow-md shadow-primary/20"
-                  : "bg-muted border-transparent hover:border-border text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {u.emoji} {u.role}
-            </button>
-          ))}
+          {userTypes.map((u, i) => {
+            const Icon = u.icon;
+            return (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border flex items-center gap-2",
+                  active === i
+                    ? "gradient-primary text-white border-transparent shadow-md shadow-primary/20"
+                    : "bg-muted border-transparent hover:border-border text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="w-4 h-4" /> {u.role}
+              </button>
+            );
+          })}
         </div>
 
         {/* Content */}

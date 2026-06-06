@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GraduationCap, Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, ArrowRight, Check, BookOpen, Users, School } from "lucide-react";
 import { useTheme } from "@/components/features/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const roles = [
-  { id: "student", label: "Student", emoji: "🧑‍🎓", desc: "Learn & achieve goals" },
-  { id: "teacher", label: "Teacher", emoji: "👩‍🏫", desc: "Teach & earn revenue" },
-  { id: "parent", label: "Parent", emoji: "👨‍👩‍👧", desc: "Monitor your child" },
-  { id: "institution", label: "Institution", emoji: "🏫", desc: "Manage your school" },
+  { id: "student", label: "Student", icon: GraduationCap, desc: "Learn & achieve goals" },
+  { id: "teacher", label: "Teacher", icon: BookOpen, desc: "Teach & earn revenue" },
+  { id: "parent", label: "Parent", icon: Users, desc: "Monitor your child" },
+  { id: "institution", label: "Institution", icon: School, desc: "Manage your school" },
 ];
 
 export default function Register() {
@@ -84,7 +84,7 @@ export default function Register() {
     setTimeout(() => {
       const user = { name: form.name, email: form.email, role: role.toLowerCase(), id: Date.now().toString() };
       localStorage.setItem("edneed-user", JSON.stringify(user));
-      toast.success("Account created! Welcome to EdNeed 🎉");
+      toast.success("Account created! Welcome to EdNeed");
       
       const paths: Record<string, string> = {
         student: "/dashboard",
@@ -355,23 +355,28 @@ export default function Register() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                  {roles.map((r) => (
-                    <button
-                      key={r.id}
-                      type="button"
-                      onClick={() => setRole(r.id)}
-                      className={cn(
-                        "p-4 rounded-xl border-2 text-left transition-all",
-                        role === r.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/40 hover:bg-muted/50"
-                      )}
-                    >
-                      <div className="text-2xl mb-2">{r.emoji}</div>
-                      <div className="font-semibold text-sm">{r.label}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{r.desc}</div>
-                    </button>
-                  ))}
+                  {roles.map((r) => {
+                    const Icon = r.icon;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setRole(r.id)}
+                        className={cn(
+                          "p-4 rounded-xl border-2 text-left transition-all",
+                          role === r.id
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/40 hover:bg-muted/50"
+                        )}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
+                          <Icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="font-semibold text-sm">{r.label}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{r.desc}</div>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="mb-6">

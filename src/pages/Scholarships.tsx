@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import {
   BookOpen, Award, Search, Filter, Calendar, DollarSign, ExternalLink,
   Bookmark, BookmarkCheck, ChevronRight, Trophy, Globe, CheckCircle,
-  Bell, Clock, ArrowRight, Users, Star, Zap
+  Bell, Clock, ArrowRight, Users, Star, Zap, FileText, Folder, Target, Mail, Lightbulb
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -199,20 +199,27 @@ export default function Scholarships() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "📝", title: "Write a Compelling Essay", desc: "Your personal statement is the most critical part of any application. Be specific, authentic, and highlight your unique story.", tip: "Use the STAR method" },
-              { icon: "⏰", title: "Apply Early", desc: "Most scholarships have rolling admissions. Early applicants often get more consideration and have time to fix errors.", tip: "Set deadline reminders" },
-              { icon: "📋", title: "Keep Documents Ready", desc: "Prepare your marksheets, recommendation letters, income certificate, and ID proofs well in advance.", tip: "Maintain a folder" },
-              { icon: "🎯", title: "Match Eligibility Precisely", desc: "Only apply for opportunities where you clearly meet all eligibility criteria. Mismatched applications are rejected instantly.", tip: "Read all requirements" },
-              { icon: "🌟", title: "Highlight Achievements", desc: "Include extracurricular activities, competitions won, community service, and leadership roles in your application.", tip: "Quantify your impact" },
-              { icon: "📬", title: "Follow Up Professionally", desc: "Send a thank-you email after interviews and politely follow up on pending applications after the stated timeline.", tip: "Be professional always" },
-            ].map((tip, i) => (
-              <div key={i} className="glass-card-premium rounded-2xl p-6 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
-                <div className="text-2xl mb-3">{tip.icon}</div>
-                <h3 className="font-bold mb-2">{tip.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{tip.desc}</p>
-                <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">💡 {tip.tip}</span>
-              </div>
-            ))}
+              { icon: FileText, title: "Write a Compelling Essay", desc: "Your personal statement is the most critical part of any application. Be specific, authentic, and highlight your unique story.", tip: "Use the STAR method" },
+              { icon: Clock, title: "Apply Early", desc: "Most scholarships have rolling admissions. Early applicants often get more consideration and have time to fix errors.", tip: "Set deadline reminders" },
+              { icon: Folder, title: "Keep Documents Ready", desc: "Prepare your marksheets, recommendation letters, income certificate, and ID proofs well in advance.", tip: "Maintain a folder" },
+              { icon: Target, title: "Match Eligibility Precisely", desc: "Only apply for opportunities where you clearly meet all eligibility criteria. Mismatched applications are rejected instantly.", tip: "Read all requirements" },
+              { icon: Award, title: "Highlight Achievements", desc: "Include extracurricular activities, competitions won, community service, and leadership roles in your application.", tip: "Quantify your impact" },
+              { icon: Mail, title: "Follow Up Professionally", desc: "Send a thank-you email after interviews and politely follow up on pending applications after the stated timeline.", tip: "Be professional always" },
+            ].map((tip, i) => {
+              const Icon = tip.icon;
+              return (
+                <div key={i} className="glass-card-premium rounded-2xl p-6 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-bold mb-2">{tip.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{tip.desc}</p>
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full inline-flex items-center gap-1">
+                    <Lightbulb className="w-3.5 h-3.5" /> {tip.tip}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

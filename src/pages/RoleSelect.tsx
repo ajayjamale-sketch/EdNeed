@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Users, School, Compass, Briefcase, Settings, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setMockUser, getRoleDashboardPath, UserRole } from "@/hooks/useRole";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 const roles = [
   {
     id: "student" as UserRole,
-    icon: "🎓",
+    icon: GraduationCap,
     title: "Student",
     desc: "Learn, practice, take tests, and track your academic progress",
     color: "blue",
@@ -15,7 +15,7 @@ const roles = [
   },
   {
     id: "parent" as UserRole,
-    icon: "👨‍👩‍👧",
+    icon: Users,
     title: "Parent",
     desc: "Monitor your child's attendance, performance, and communicate with teachers",
     color: "green",
@@ -23,7 +23,7 @@ const roles = [
   },
   {
     id: "teacher" as UserRole,
-    icon: "👩‍🏫",
+    icon: BookOpen,
     title: "Teacher / Tutor",
     desc: "Create and publish courses, conduct classes, and evaluate students",
     color: "purple",
@@ -31,7 +31,7 @@ const roles = [
   },
   {
     id: "institution" as UserRole,
-    icon: "🏫",
+    icon: School,
     title: "School / Institute",
     desc: "Manage students, track attendance, handle fees, and generate reports",
     color: "orange",
@@ -39,7 +39,7 @@ const roles = [
   },
   {
     id: "counselor" as UserRole,
-    icon: "🧭",
+    icon: Compass,
     title: "Career Counselor",
     desc: "Assess students, provide guidance, and recommend career opportunities",
     color: "teal",
@@ -47,7 +47,7 @@ const roles = [
   },
   {
     id: "recruiter" as UserRole,
-    icon: "💼",
+    icon: Briefcase,
     title: "Recruiter",
     desc: "Post internships, review candidates, and connect with talented students",
     color: "rose",
@@ -55,7 +55,7 @@ const roles = [
   },
   {
     id: "admin" as UserRole,
-    icon: "⚙️",
+    icon: Settings,
     title: "Admin",
     desc: "Manage the platform, verify educators, and analyze growth metrics",
     color: "slate",
@@ -113,23 +113,28 @@ export default function RoleSelect() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full max-w-5xl">
-          {roles.map((role) => (
-            <button
-              key={role.id}
-              onClick={() => handleSelect(role)}
-              className={cn(
-                "p-5 rounded-2xl border-2 text-left transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] group",
-                colorMap[role.color]
-              )}
-            >
-              <div className="text-3xl mb-3">{role.icon}</div>
-              <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{role.title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{role.desc}</p>
-              <div className="mt-3 text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                Enter Dashboard →
-              </div>
-            </button>
-          ))}
+          {roles.map((role) => {
+            const Icon = role.icon;
+            return (
+              <button
+                key={role.id}
+                onClick={() => handleSelect(role)}
+                className={cn(
+                  "p-5 rounded-2xl border-2 text-left transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] group",
+                  colorMap[role.color]
+                )}
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{role.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{role.desc}</p>
+                <div className="mt-3 text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                  Enter Dashboard →
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         <p className="text-xs text-muted-foreground mt-8">

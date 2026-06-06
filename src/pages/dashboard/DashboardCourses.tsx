@@ -142,7 +142,7 @@ export default function DashboardCourses() {
                     { label: "Duration", val: selectedCourse.duration },
                     { label: "Lessons", val: `${selectedCourse.lessons} lessons` },
                     { label: "Category", val: selectedCourse.category },
-                    { label: "Rating", val: `${selectedCourse.rating} ⭐` },
+                    { label: "Rating", val: `${selectedCourse.rating}` },
                   ].map((d, i) => (
                     <div key={i} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
                       <span className="text-muted-foreground">{d.label}</span>

@@ -135,13 +135,13 @@ export default function Pricing() {
                 className={cn(
                   "rounded-3xl border p-8 relative flex flex-col transition-all duration-300",
                   plan.popular
-                    ? "glass-card-premium border-primary/50 shadow-2xl shadow-primary/25 xl:scale-[1.03] z-10"
+                    ? "gradient-primary text-white border-primary/50 shadow-2xl shadow-primary/25 xl:scale-[1.03] z-10"
                     : "bg-card border-border hover:border-primary/30 card-hover"
                 )}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
-                    ⭐ Most Popular
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-current" /> Most Popular
                   </div>
                 )}
                 <div className="mb-5">

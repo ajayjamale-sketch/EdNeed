@@ -42,7 +42,7 @@ export default function TeacherDashboard() {
           { label: "Active Courses", val: "3", icon: BookOpen, color: "blue" },
           { label: "Total Students", val: "3,679", icon: Users, color: "purple" },
           { label: "Monthly Earnings", val: "₹35K", icon: DollarSign, color: "green" },
-          { label: "Avg. Rating", val: "4.8 ⭐", icon: Star, color: "orange" },
+          { label: "Avg. Rating", val: "4.8", icon: Star, color: "orange" },
         ].map((s, i) => (
           <div key={i} className="bg-card border border-border rounded-2xl p-5">
             <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center mb-3", colorMap[s.color])}>
@@ -121,7 +121,7 @@ export default function TeacherDashboard() {
               <h4 className="font-semibold text-xs leading-snug mb-2">{c.title}</h4>
               {c.status === "published" ? (
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  <div className="flex justify-between"><span>{c.students.toLocaleString()} students</span><span className="text-yellow-500">{c.rating} ⭐</span></div>
+                  <div className="flex justify-between"><span>{c.students.toLocaleString()} students</span><span className="text-yellow-500">{c.rating}</span></div>
                   <div className="font-semibold text-accent">₹{c.revenue.toLocaleString()}</div>
                 </div>
               ) : (
