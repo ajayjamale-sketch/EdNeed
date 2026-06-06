@@ -2,12 +2,12 @@ import { getMockUser, UserRole } from "@/hooks/useRole";
 import { DashboardProvider } from "./dashboard/DashboardContext";
 
 import StudentDashboard from "./dashboard/StudentDashboard";
-import ParentDashboard from "./dashboard/ParentDashboard";
-import TeacherDashboard from "./dashboard/TeacherDashboard";
-import InstitutionDashboard from "./dashboard/InstitutionDashboard";
-import CounselorDashboard from "./dashboard/CounselorDashboard";
-import RecruiterDashboard from "./dashboard/RecruiterDashboard";
-import AdminDashboard from "./dashboard/AdminDashboard";
+import ParentDashboard from "./dashboard/parent/ParentDashboardRoot";
+import TeacherDashboard from "./dashboard/teacher/TeacherDashboardRoot";
+import InstitutionDashboard from "./dashboard/institution/InstitutionDashboardRoot";
+import CounselorDashboard from "./dashboard/counselor/CounselorDashboardRoot";
+import RecruiterDashboard from "./dashboard/recruiter/RecruiterDashboardRoot";
+import AdminDashboard from "./dashboard/admin/AdminDashboardRoot";
 
 export default function Dashboard() {
   const user = getMockUser();

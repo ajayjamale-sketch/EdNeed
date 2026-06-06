@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Users, BarChart3,
@@ -86,13 +86,13 @@ const navByRole: Record<UserRole, NavItem[]> = {
 };
 
 const roleColors: Record<UserRole, string> = {
-  student: "from-blue-600 to-blue-700",
-  parent: "from-green-600 to-green-700",
-  teacher: "from-purple-600 to-purple-700",
-  institution: "from-orange-600 to-orange-700",
-  counselor: "from-teal-600 to-teal-700",
-  recruiter: "from-rose-600 to-rose-700",
-  admin: "from-slate-700 to-slate-800",
+  student: "from-[#2563EB] to-[#7C3AED]",
+  parent: "from-[#2563EB] to-[#7C3AED]",
+  teacher: "from-[#2563EB] to-[#7C3AED]",
+  institution: "from-[#2563EB] to-[#7C3AED]",
+  counselor: "from-[#2563EB] to-[#7C3AED]",
+  recruiter: "from-[#2563EB] to-[#7C3AED]",
+  admin: "from-[#2563EB] to-[#7C3AED]",
 };
 
 interface DashboardLayoutProps {
@@ -101,9 +101,17 @@ interface DashboardLayoutProps {
   subtitle?: string;
 }
 
+import { toast } from "sonner";
+
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(3);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifs, setNotifs] = useState([
+    { id: 1, title: "New assignment uploaded", desc: "Physics assignment due on Tuesday", time: "5 mins ago", read: false },
+    { id: 2, title: "Grade published", desc: "Calculus test score: A-", time: "1 hour ago", read: false },
+    { id: 3, title: "Class reminder", desc: "Chemistry live class starts in 30 mins", time: "2 hours ago", read: false },
+  ]);
+  const unreadCount = notifs.filter(n => !n.read).length;
   const [searchVal, setSearchVal] = useState("");
   const { resolvedTheme, setTheme } = useTheme();
   const navigate = useNavigate();
@@ -113,6 +121,14 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
   const role = (typeof rawRole === 'string' ? rawRole.toLowerCase() : "student") as UserRole;
   const navItems = navByRole[role] || navByRole.student;
   const { activeTab, setActiveTab } = useDashboardTab();
+
+  useEffect(() => {
+    let tabId = location.pathname.split("/").pop();
+    if (!tabId || tabId === "dashboard" || tabId === role) {
+      tabId = "overview";
+    }
+    setActiveTab(tabId);
+  }, [location.pathname, role, setActiveTab]);
 
   const handleLogout = () => {
     localStorage.removeItem("edneed-user");
@@ -235,15 +251,63 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
             >
               {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <button
-              onClick={() => setNotifications(0)}
-              className="relative w-9 h-9 rounded-lg flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground"
-            >
-              <Bell className="w-4 h-4" />
-              {notifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-destructive text-white rounded-full text-[10px] flex items-center justify-center font-bold">{notifications}</span>
+            <div className="relative">
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative w-9 h-9 rounded-lg flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-destructive text-white rounded-full text-[10px] flex items-center justify-center font-bold">{unreadCount}</span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-2.5 border-b border-border flex justify-between items-center bg-muted/40">
+                      <span className="font-bold text-xs">Notifications</span>
+                      {unreadCount > 0 && (
+                        <button 
+                          onClick={() => setNotifs(notifs.map(n => ({ ...n, read: true })))}
+                          className="text-[10px] font-semibold text-primary hover:underline bg-transparent border-0 cursor-pointer p-0"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifs.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-xs text-muted-foreground">
+                          No notifications yet
+                        </div>
+                      ) : (
+                        notifs.map((n) => (
+                          <div 
+                            key={n.id}
+                            onClick={() => {
+                              setNotifs(notifs.map(x => x.id === n.id ? { ...x, read: true } : x));
+                              toast.info(`${n.title}: ${n.desc}`);
+                            }}
+                            className={cn(
+                              "px-4 py-3 border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors text-left",
+                              !n.read && "bg-primary/5"
+                            )}
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <span className={cn("text-xs font-semibold", !n.read ? "text-foreground" : "text-muted-foreground")}>{n.title}</span>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">{n.time}</span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 leading-normal">{n.desc}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
-            </button>
+            </div>
             <Link to="/profile" className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm hover:opacity-90 transition-opacity flex-shrink-0 bg-gradient-to-br", roleColors[role])}>
               {user?.name?.charAt(0) || "U"}
             </Link>
