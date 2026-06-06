@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageSquare, Building, Users } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageSquare, Building, Users, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
