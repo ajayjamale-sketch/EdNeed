@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpen, Award, Search, Filter, Calendar, DollarSign, ExternalLink,
   Bookmark, BookmarkCheck, ChevronRight, Trophy, Globe, CheckCircle,
@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const categories = ["All", "Scholarships", "Internships", "Competitions", "Olympiads", "Grants", "Fellowships"];
 
@@ -45,6 +47,59 @@ export default function Scholarships() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [data, setData] = useState(opportunities);
+
+  const [selectedOpp, setSelectedOpp] = useState<any>(null);
+  const [applyForm, setApplyForm] = useState({ name: "", email: "", phone: "", SOP: "", qualification: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigate = useNavigate();
+  const isLoggedIn = (() => {
+    try {
+      const stored = localStorage.getItem("edneed-user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        return !!(user && user.role);
+      }
+    } catch { /* ignore */ }
+    return false;
+  })();
+
+  const handleApplyClick = (opp: any) => {
+    if (!isLoggedIn) {
+      toast.error("Please log in or register to apply for opportunities.");
+      navigate("/register");
+      return;
+    }
+    try {
+      const stored = localStorage.getItem("edneed-user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        setApplyForm({
+          name: user.name || "",
+          email: user.email || "",
+          phone: "",
+          SOP: "",
+          qualification: ""
+        });
+      }
+    } catch { /* ignore */ }
+    setSelectedOpp(opp);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!applyForm.phone || !applyForm.qualification || !applyForm.SOP) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success(`Application submitted successfully for ${selectedOpp.title}!`);
+      setSelectedOpp(null);
+      setApplyForm({ name: "", email: "", phone: "", SOP: "", qualification: "" });
+    }, 1500);
+  };
 
   const toggleSave = (id: number) => {
     setData((prev) => prev.map((o) => o.id === id ? { ...o, saved: !o.saved } : o));
@@ -158,7 +213,7 @@ export default function Scholarships() {
                   <div className="flex items-center gap-2 text-xs text-muted-foreground"><Users className="w-3 h-3 flex-shrink-0" />{opp.applicants.toLocaleString()} applicants</div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground"><CheckCircle className="w-3 h-3 flex-shrink-0" />{opp.eligibility}</div>
                 </div>
-                <button onClick={() => toast.success(`Opening application for ${opp.title}`)} className="w-full py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 mt-auto">
+                <button onClick={() => handleApplyClick(opp)} className="w-full py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 mt-auto">
                   Apply Now
                 </button>
               </div>
@@ -240,6 +295,89 @@ export default function Scholarships() {
           </div>
         </div>
       </section>
+      {/* Application Form Modal */}
+      <Dialog open={!!selectedOpp} onOpenChange={(open) => !open && setSelectedOpp(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background border border-border rounded-3xl p-6 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Apply for Opportunity</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              You are applying for <strong className="text-foreground">{selectedOpp?.title}</strong> organized by {selectedOpp?.org}.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-muted-foreground">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={applyForm.name}
+                  onChange={(e) => setApplyForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="Your Name"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-muted-foreground">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={applyForm.email}
+                  onChange={(e) => setApplyForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-muted-foreground">Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={applyForm.phone}
+                  onChange={(e) => setApplyForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="e.g. +91 98765 43210"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-muted-foreground">Highest Qualification / Class *</label>
+                <input
+                  type="text"
+                  required
+                  value={applyForm.qualification}
+                  onChange={(e) => setApplyForm(prev => ({ ...prev, qualification: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="e.g. Class 12, B.Tech 3rd Year"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-muted-foreground">Statement of Purpose / Why do you qualify? *</label>
+              <textarea
+                required
+                rows={4}
+                value={applyForm.SOP}
+                onChange={(e) => setApplyForm(prev => ({ ...prev, SOP: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                placeholder="Explain why you deserve this scholarship or opportunity..."
+              />
+            </div>
+
+            <DialogFooter className="pt-4 flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setSelectedOpp(null)} className="rounded-xl border border-border">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-primary text-white hover:bg-primary/90 flex-1">
+                {isSubmitting ? "Submitting..." : "Submit Application"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

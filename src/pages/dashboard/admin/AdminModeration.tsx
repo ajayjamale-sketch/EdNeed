@@ -3,6 +3,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { AlertCircle, Shield, CheckCircle, XCircle, Eye, BookOpen, MessageSquare, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const initialQueue = [
   { id: 1, type: "Course Content", item: "JEE Advanced Chemistry 2025 — Dr. Sharma", flag: "Unverified exam date claims", reported_by: "User #4829", time: "2h ago", priority: "high", icon: BookOpen },
@@ -20,6 +22,7 @@ const priorityColors: Record<string, string> = {
 
 export default function AdminModeration() {
   const [queue, setQueue] = useState(initialQueue);
+  const [viewItem, setViewItem] = useState<any>(null);
 
   const approve = (id: number) => {
     setQueue((prev) => prev.filter((q) => q.id !== id));
@@ -77,7 +80,7 @@ export default function AdminModeration() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={() => toast.success(`Reviewing: ${item.item}`)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors">
+                  <button onClick={() => setViewItem(item)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors">
                     <Eye className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => approve(item.id)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-semibold hover:opacity-90">
@@ -92,6 +95,60 @@ export default function AdminModeration() {
           ))}
         </div>
       )}
+
+      {/* --- Review Item Modal --- */}
+      <Dialog open={!!viewItem} onOpenChange={(open) => !open && setViewItem(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Review Flagged Content</DialogTitle>
+          </DialogHeader>
+          {viewItem && (
+            <div className="py-4 space-y-5">
+              <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl border border-border">
+                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0", viewItem.priority === "high" ? "bg-red-50 dark:bg-red-950" : "bg-muted")}>
+                  <viewItem.icon className={cn("w-6 h-6", viewItem.priority === "high" ? "text-destructive" : "text-muted-foreground")} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-bold text-primary">{viewItem.type}</span>
+                    <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full capitalize", priorityColors[viewItem.priority])}>
+                      {viewItem.priority} Priority
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-lg leading-snug">{viewItem.item}</h3>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    Reported by <span className="font-medium text-foreground">{viewItem.reported_by}</span> • {viewItem.time}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-red-200 bg-red-50 dark:border-red-900/30 dark:bg-red-950/20">
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-semibold mb-1 text-sm">
+                  <AlertCircle className="w-4 h-4" /> Reason for Flagging
+                </div>
+                <p className="text-sm text-red-800 dark:text-red-200">{viewItem.flag}</p>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Please review the content carefully. Removing the content will delete it from the platform permanently and may penalize the offending user. Approving it will dismiss this report.
+              </p>
+            </div>
+          )}
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setViewItem(null)}>Cancel</Button>
+            {viewItem && (
+              <>
+                <Button onClick={() => { approve(viewItem.id); setViewItem(null); }} className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1">
+                  <CheckCircle className="w-4 h-4 mr-2" /> Approve Content
+                </Button>
+                <Button onClick={() => { reject(viewItem.id); setViewItem(null); }} variant="destructive" className="flex-1">
+                  <XCircle className="w-4 h-4 mr-2" /> Remove Content
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

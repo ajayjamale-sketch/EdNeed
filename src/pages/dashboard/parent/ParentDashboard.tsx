@@ -5,6 +5,8 @@ import { Users, TrendingUp, Calendar, MessageSquare, Star, CheckCircle, AlertCir
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from "recharts";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const children = [
   { name: "Riya Kumar", class: "Class 10", school: "Delhi Public School", avatar: "RK", color: "bg-blue-500", attendance: 92, avgScore: 81, rank: 12, courses: 5 },
@@ -32,6 +34,10 @@ const messages = [
 
 export default function ParentDashboard() {
   const [selectedChild, setSelectedChild] = useState(0);
+  const [linkChildOpen, setLinkChildOpen] = useState(false);
+  const [viewMsg, setViewMsg] = useState<any>(null);
+  const [composeOpen, setComposeOpen] = useState(false);
+
   const child = children[selectedChild];
 
   return (
@@ -52,7 +58,7 @@ export default function ParentDashboard() {
           </button>
         ))}
         <button
-          onClick={() => toast.success("Add child account feature coming soon!")}
+          onClick={() => setLinkChildOpen(true)}
           className="flex items-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all text-sm font-medium"
         >
           + Link Child
@@ -161,7 +167,7 @@ export default function ParentDashboard() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                onClick={() => toast.success(`Opening message from ${m.from}`)}
+                onClick={() => setViewMsg(m)}
                 className={cn("flex items-start gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted transition-colors", !m.read && "bg-primary/5 border border-primary/10")}
               >
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -179,13 +185,87 @@ export default function ParentDashboard() {
             ))}
           </div>
           <button
-            onClick={() => toast.success("Composing new message to teacher...")}
+            onClick={() => setComposeOpen(true)}
             className="w-full mt-4 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-2"
           >
             <MessageSquare className="w-3.5 h-3.5" /> Message a Teacher
           </button>
         </div>
       </div>
+
+      {/* Modals */}
+      <Dialog open={linkChildOpen} onOpenChange={setLinkChildOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Link a Child Account</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Child's Roll Number / ID</label>
+              <input placeholder="Enter ID" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">School PIN</label>
+              <input placeholder="Enter PIN provided by school" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLinkChildOpen(false)}>Cancel</Button>
+            <Button onClick={() => { toast.success("Link request sent to school admin for verification!"); setLinkChildOpen(false); }}>Submit Request</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewMsg} onOpenChange={(open) => !open && setViewMsg(null)}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Message from {viewMsg?.from}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div>
+              <div className="text-xs text-muted-foreground">Subject</div>
+              <div className="font-semibold">{viewMsg?.subject}</div>
+            </div>
+            <div className="pt-2 border-t border-border">
+              <p className="text-sm text-foreground leading-relaxed">
+                Dear Parent,<br/><br/>
+                This is regarding the recent progress of your child. We've noticed some specific areas where they could use some extra support at home. 
+                Please feel free to reply if you'd like to schedule a quick 5-minute call.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewMsg(null)}>Close</Button>
+            <Button onClick={() => { setViewMsg(null); setComposeOpen(true); }}>Reply</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Message Teacher</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Select Teacher</label>
+              <select className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background">
+                <option>Dr. Aisha Patel (Physics)</option>
+                <option>Mr. Ravi Tiwari (Mathematics)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Message</label>
+              <textarea placeholder="Type your message here..." className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background min-h-[100px]"></textarea>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setComposeOpen(false)}>Cancel</Button>
+            <Button onClick={() => { toast.success("Message sent successfully!"); setComposeOpen(false); }}>Send</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </DashboardLayout>
   );
 }

@@ -36,6 +36,15 @@ export default function TeacherSchedule() {
     toast.success("Event removed");
   };
 
+  const startEvent = (ev: typeof events[0]) => {
+    if (ev.type === "deadline") {
+      toast.success(`Opening submissions for ${ev.title}`);
+    } else {
+      toast.success(`Starting ${ev.title}!`);
+      setEvents((prev) => prev.filter((e) => e.id !== ev.id));
+    }
+  };
+
   const grouped = events.reduce((acc, ev) => {
     if (!acc[ev.day]) acc[ev.day] = [];
     acc[ev.day].push(ev);
@@ -102,7 +111,7 @@ export default function TeacherSchedule() {
                       <div className="text-xs text-muted-foreground mt-0.5">{ev.time} {ev.duration && `· ${ev.duration}`} · {ev.students} students</div>
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => toast.success(`Starting: ${ev.title}`)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">
+                      <button onClick={() => startEvent(ev)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">
                         {ev.type === "deadline" ? "View" : "Start"}
                       </button>
                       <button onClick={() => deleteEvent(ev.id)} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors">

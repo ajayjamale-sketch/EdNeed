@@ -3,6 +3,10 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search, Users, UserCheck, Building, GraduationCap, Eye, Edit, Trash2, Ban, CheckCircle, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const users = [
   { id: 1, name: "Rahul Sharma", email: "rahul@example.com", role: "Student", joined: "Jan 15, 2025", status: "active", courses: 5, lastActive: "Today" },
@@ -32,6 +36,20 @@ export default function AdminUsers() {
   const [data, setData] = useState(users);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const openEditModal = (u: any) => {
+    setSelectedUser({ ...u });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveUser = () => {
+    setData((prev) => prev.map((u) => (u.id === selectedUser.id ? selectedUser : u)));
+    toast.success(`Updated role for ${selectedUser.name}`);
+    setIsEditModalOpen(false);
+  };
 
   const filtered = data.filter((u) => {
     const m = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
@@ -113,7 +131,8 @@ export default function AdminUsers() {
                   <td className="px-4 py-3 text-xs text-muted-foreground">{u.lastActive}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => toast.success(`Viewing ${u.name}'s profile...`)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-muted transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => openEditModal(u)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-muted transition-colors" title="View/Edit Profile"><Eye className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => openEditModal(u)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-muted transition-colors" title="Change Role"><Edit className="w-3.5 h-3.5" /></button>
                       {u.status === "pending" ? (
                         <button onClick={() => approve(u.id)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-accent/10 text-accent transition-colors"><CheckCircle className="w-3.5 h-3.5" /></button>
                       ) : (
@@ -128,6 +147,62 @@ export default function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* --- Edit / View User Modal --- */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>View / Edit User</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="grid gap-4 py-4">
+              <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-xl border border-border">
+                <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+                  {selectedUser.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-semibold text-lg">{selectedUser.name}</div>
+                  <div className="text-sm text-muted-foreground">{selectedUser.email}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <div className={cn("text-sm font-semibold capitalize px-3 py-2 rounded-xl border border-border", statusColors[selectedUser.status] || "")}>
+                    {selectedUser.status}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Joined</Label>
+                  <div className="text-sm px-3 py-2 border border-border rounded-xl text-muted-foreground">
+                    {selectedUser.joined}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role-select">User Role</Label>
+                <select 
+                  id="role-select"
+                  value={selectedUser.role} 
+                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })} 
+                  className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  {["Student", "Teacher", "Institution", "Parent", "Recruiter", "Admin"].map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">Changing the role will grant or revoke access to certain platform features immediately.</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveUser}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

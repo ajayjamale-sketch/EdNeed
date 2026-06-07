@@ -1,10 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
-import { CheckCircle, ArrowRight, Star, Shield, Clock, Zap, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  CheckCircle, ArrowRight, Star, Shield, Clock, Zap,
+  ChevronDown, ChevronUp
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-const plans = [
+// --- Auth hook that reads from localStorage (same as the rest of the app) ---
+const useAuth = () => {
+  const isAuthenticated = (() => {
+    try {
+      const stored = localStorage.getItem("edneed-user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        return !!(user && user.role);
+      }
+    } catch { /* ignore */ }
+    return false;
+  })();
+  return { isAuthenticated };
+};
+
+// --- Plan type ---
+interface PlanFeature {
+  text: string;
+  included: boolean;
+}
+
+interface Plan {
+  name: string;
+  tagline: string;
+  price: { monthly: number; annual: number };
+  color: string;
+  popular?: boolean;
+  features: PlanFeature[];
+  cta: string;
+  href: string;
+}
+
+const plans: Plan[] = [
   {
     name: "Free",
     tagline: "Get started at no cost",
@@ -91,13 +129,65 @@ const compareFaqs = [
   { q: "Can institutions get a custom quote?", a: "Yes! For institutions with 100+ students or specific requirements, contact our sales team for a custom pricing package." },
 ];
 
+
 export default function Pricing() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  // --- Check for return URL after login (only for paid plans) ---
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const planParam = params.get("selectedPlan");
+    if (planParam && isAuthenticated) {
+      const plan = plans.find(p => p.name.toLowerCase() === planParam.toLowerCase());
+      // Only show modal for paid plans (Pro, Educator, or Institution)
+      if (plan && (plan.name === "Pro" || plan.name === "Educator" || plan.name === "Institution")) {
+        setSelectedPlan(plan);
+        // Clean URL
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  }, [location.search, isAuthenticated, navigate]);
+
+  const handlePlanSelect = (plan: Plan) => {
+    // Institution plan -> redirect to contact sales
+    if (plan.name === "Institution") {
+      navigate("/contact");
+      return;
+    }
+
+    // Free plan → register page
+    if (plan.name === "Free") {
+      navigate("/register");
+      return;
+    }
+
+    // Paid plans: Pro and Educator
+    if (!isAuthenticated) {
+      // Not logged in → redirect to login
+      toast.error(`Please sign in to subscribe to the ${plan.name} plan`);
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}&selectedPlan=${plan.name.toLowerCase()}`);
+      return;
+    }
+
+    // Logged in → show payment modal
+    setSelectedPlan(plan);
+  };
+
+  const handleSubscribe = () => {
+    if (!selectedPlan) return;
+    toast.success(`Successfully subscribed to ${selectedPlan.name} plan!`);
+    setSelectedPlan(null);
+    // In real app, you'd call your payment API here
+  };
 
   return (
     <Layout>
-      {/* Hero */}
+      {/* Hero section – unchanged */}
       <section className="relative pt-20 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 to-background dark:from-slate-950 dark:to-background" />
         <div className="container-custom relative z-10 text-center">
@@ -109,12 +199,13 @@ export default function Pricing() {
             Start free, upgrade as you grow. No hidden fees. Cancel anytime.
           </p>
 
-          {/* Toggle */}
+          {/* Annual/Monthly Toggle */}
           <div className="flex items-center justify-center gap-3">
             <span className={cn("text-sm font-medium", !annual && "text-foreground text-base font-semibold")}>Monthly</span>
             <button
               onClick={() => setAnnual(!annual)}
               className={cn("relative w-14 h-7 rounded-full transition-colors", annual ? "bg-primary" : "bg-muted")}
+              aria-label="Toggle annual billing"
             >
               <span className={cn("absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform", annual && "translate-x-7")} />
             </button>
@@ -125,7 +216,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Plans */}
+      {/* Plans Grid – same as before */}
       <section className="pb-20">
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -173,8 +264,8 @@ export default function Pricing() {
                   ))}
                 </ul>
 
-                <Link
-                  to={plan.href}
+                <button
+                  onClick={() => handlePlanSelect(plan)}
                   className={cn(
                     "block w-full py-3 rounded-xl text-center text-sm font-semibold transition-all",
                     plan.popular
@@ -183,12 +274,12 @@ export default function Pricing() {
                   )}
                 >
                   {plan.cta}
-                </Link>
+                </button>
               </div>
             ))}
           </div>
 
-          {/* Trust row */}
+          {/* Trust Badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
             {[
               { icon: Shield, text: "14-day free trial" },
@@ -204,14 +295,13 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Feature Comparison Table */}
+      {/* Feature Comparison Table – unchanged */}
       <section className="section-padding hidden md:block">
         <div className="container-custom max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">Compare <span className="gradient-text">Features</span></h2>
             <p className="text-muted-foreground">A detailed breakdown of everything included in our plans.</p>
           </div>
-          
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
               <thead className="bg-muted/30">
@@ -243,7 +333,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Compare FAQ */}
+      {/* FAQ Section – unchanged */}
       <section className="section-padding border-t border-border bg-muted/20">
         <div className="container-custom max-w-2xl mx-auto">
           <div className="text-center mb-10">
@@ -274,7 +364,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Enterprise CTA */}
+      {/* Enterprise CTA – unchanged */}
       <section className="section-padding">
         <div className="container-custom">
           <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-10 md:p-14 text-white text-center relative overflow-hidden">
@@ -296,6 +386,64 @@ export default function Pricing() {
           </div>
         </div>
       </section>
+
+      {/* Payment Modal – only for paid plans (Pro/Educator/Institution) */}
+      <Dialog
+        open={!!selectedPlan && (selectedPlan.name === "Pro" || selectedPlan.name === "Educator" || selectedPlan.name === "Institution")}
+        onOpenChange={(open) => !open && setSelectedPlan(null)}
+      >
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Complete Subscription</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-2xl mb-1 text-foreground">
+              ₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}
+              <span className="text-sm font-medium text-muted-foreground">/{annual ? 'year' : 'month'}</span>
+            </h3>
+            <p className="text-sm font-semibold mb-1 text-foreground">{selectedPlan?.name} Plan</p>
+            <p className="text-xs text-muted-foreground mb-4">{annual ? "Billed annually" : "Billed monthly"}</p>
+
+            <div className="text-left bg-muted p-4 rounded-xl mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Plan Cost</span>
+                <span className="font-medium">₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}</span>
+              </div>
+              {annual && selectedPlan && selectedPlan.price.monthly > 0 && (
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Annual Discount</span>
+                  <span className="font-medium text-green-600">-20%</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2">
+                <span>Total Today</span>
+                <span>₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-left mb-2">Select Payment Method</p>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer bg-primary/5 border-primary/30">
+                <div className="w-4 h-4 rounded-full border-[5px] border-primary flex-shrink-0" />
+                <span className="text-sm font-semibold">Credit/Debit Card</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50">
+                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" />
+                <span className="text-sm font-medium text-muted-foreground">UPI / Google Pay</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setSelectedPlan(null)}>Cancel</Button>
+            <Button onClick={handleSubscribe} className="bg-primary hover:bg-primary/90 text-white w-full">
+              Subscribe Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

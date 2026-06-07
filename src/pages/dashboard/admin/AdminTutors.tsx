@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { UserCheck, Search, CheckCircle, XCircle, Eye, Star, BookOpen } from "lucide-react";
+import { UserCheck, Search, CheckCircle, XCircle, Eye, Star, BookOpen, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const tutors = [
   { id: 1, name: "Dr. Vivek Agarwal", email: "vivek@example.com", subject: "Physics (JEE)", experience: "12 years", rating: 4.9, courses: 3, students: 18500, status: "verified", docs: "complete" },
@@ -22,6 +24,7 @@ const statusCfg: Record<string, { color: string; label: string }> = {
 export default function AdminTutors() {
   const [data, setData] = useState(tutors);
   const [search, setSearch] = useState("");
+  const [viewTutor, setViewTutor] = useState<any>(null);
 
   const filtered = data.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()) || t.subject.toLowerCase().includes(search.toLowerCase()));
 
@@ -83,7 +86,7 @@ export default function AdminTutors() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={() => toast.success(`Reviewing ${t.name}'s documents...`)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setViewTutor(t)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><Eye className="w-3.5 h-3.5" /></button>
                   {(t.status === "pending" || t.status === "flagged") && (
                     <>
                       <button onClick={() => verify(t.id)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-semibold hover:opacity-90">
@@ -100,6 +103,69 @@ export default function AdminTutors() {
           );
         })}
       </div>
+
+      {/* --- Review Tutor Modal --- */}
+      <Dialog open={!!viewTutor} onOpenChange={(open) => !open && setViewTutor(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Review Tutor Application</DialogTitle>
+          </DialogHeader>
+          {viewTutor && (
+            <div className="py-4 space-y-5">
+              <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl border border-border">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  {viewTutor.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{viewTutor.name}</h3>
+                  <div className="text-sm text-muted-foreground">{viewTutor.email}</div>
+                  <div className="mt-2 flex gap-2">
+                    <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full", statusCfg[viewTutor.status]?.color)}>
+                      {statusCfg[viewTutor.status]?.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-xl border border-border bg-card">
+                  <div className="text-xs text-muted-foreground mb-1">Subject</div>
+                  <div className="font-semibold text-sm">{viewTutor.subject}</div>
+                </div>
+                <div className="p-3 rounded-xl border border-border bg-card">
+                  <div className="text-xs text-muted-foreground mb-1">Experience</div>
+                  <div className="font-semibold text-sm">{viewTutor.experience}</div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Uploaded Documents</h4>
+                <div className="flex items-center justify-between p-3 border border-border rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm font-semibold">Identity & Credentials.pdf</div>
+                      <div className="text-xs text-muted-foreground">Uploaded with application</div>
+                    </div>
+                  </div>
+                  <span className={cn("text-xs px-2 py-1 rounded-full font-semibold", viewTutor.docs === "complete" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>
+                    {viewTutor.docs === "complete" ? "Verified" : "Missing Info"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setViewTutor(null)}>Close</Button>
+            {viewTutor && (viewTutor.status === "pending" || viewTutor.status === "flagged") && (
+              <>
+                <Button variant="destructive" onClick={() => { reject(viewTutor.id); setViewTutor(null); }}>Reject</Button>
+                <Button onClick={() => { verify(viewTutor.id); setViewTutor(null); }}>Verify Tutor</Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

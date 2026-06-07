@@ -1,10 +1,12 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Users, Calendar, TrendingUp, Target, Star, ChevronRight, BookOpen, Briefcase } from "lucide-react";
+import { Users, Calendar, TrendingUp, Target, Star, ChevronRight, BookOpen, Briefcase, FileText, CheckCircle, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const sessionsData = [
   { month: "Jan", sessions: 12 }, { month: "Feb", sessions: 18 }, { month: "Mar", sessions: 15 },
@@ -26,6 +28,8 @@ const recentActivities = [
 ];
 
 export default function CounselorDashboard() {
+  const [viewStudent, setViewStudent] = useState<any>(null);
+
   return (
     <DashboardLayout title="Career Counselor Dashboard" subtitle="Guide students toward their ideal career paths">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -88,7 +92,7 @@ export default function CounselorDashboard() {
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           {myStudents.map((s, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border border-border rounded-xl hover:border-primary/30 transition-colors cursor-pointer" onClick={() => toast.success(`Opening ${s.name}'s counseling profile...`)}>
+            <div key={i} className="flex items-center gap-4 p-4 border border-border rounded-xl hover:border-primary/30 transition-colors cursor-pointer" onClick={() => setViewStudent(s)}>
               <div className={cn("w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0", s.color)}>{s.initials}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm">{s.name}</div>
@@ -105,6 +109,69 @@ export default function CounselorDashboard() {
           ))}
         </div>
       </div>
+
+      {/* --- View Student Profile Modal --- */}
+      <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Counseling Profile</DialogTitle>
+          </DialogHeader>
+          {viewStudent && (
+            <div className="py-2">
+              <div className="flex items-center gap-4 mb-5 p-4 rounded-xl border border-border bg-muted/30">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0", viewStudent.color)}>{viewStudent.initials}</div>
+                <div>
+                  <h3 className="font-bold text-lg">{viewStudent.name}</h3>
+                  <div className="text-sm text-muted-foreground">{viewStudent.class}</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-card border border-border rounded-xl p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Target Career</div>
+                    <div className="font-semibold text-sm">{viewStudent.target}</div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Preparation Progress</div>
+                    <div className="font-semibold text-sm text-primary">{viewStudent.progress}% Complete</div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Recent Assessments</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 border border-border rounded-xl text-sm">
+                      <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /> Aptitude Test 1</div>
+                      <span className="text-green-600 font-semibold text-xs bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-md">Score: 88%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border border-border rounded-xl text-sm">
+                      <div className="flex items-center gap-2"><Target className="w-4 h-4 text-muted-foreground" /> Career Interest Profiler</div>
+                      <span className="text-accent font-semibold text-xs bg-accent/10 px-2 py-0.5 rounded-md">STEM Aligned</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Upcoming Schedule</h4>
+                  <div className="flex items-center justify-between p-3 border border-primary/20 bg-primary/5 rounded-xl text-sm">
+                    <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> 1-on-1 Mentorship Session</div>
+                    <span className="text-primary font-semibold text-xs">{viewStudent.next}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewStudent(null)}>Close</Button>
+            {viewStudent && (
+              <Button onClick={() => { toast.success(`Rescheduling session for ${viewStudent.name}...`); setViewStudent(null); }} className="gap-2">
+                <Calendar className="w-4 h-4" /> Manage Schedule
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

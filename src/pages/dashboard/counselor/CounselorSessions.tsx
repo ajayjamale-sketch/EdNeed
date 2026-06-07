@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Calendar, Clock, Plus, Video, Check, X, ChevronDown } from "lucide-react";
+import { Calendar, Clock, Plus, Video, Check, X, ChevronDown, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const sessions = [
   { id: 1, student: "Rahul Mehta", type: "Career Assessment Review", date: "Jun 5, 2025", time: "4:00 PM", duration: "45 min", mode: "Video", status: "upcoming", notes: "Discuss IIT vs NIT options" },
@@ -14,16 +16,37 @@ const sessions = [
 ];
 
 export default function CounselorSessions() {
+  const [data, setData] = useState(sessions);
   const [filter, setFilter] = useState("upcoming");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ student: "Rahul Mehta", type: "Career Assessment", date: "", time: "10:00", mode: "Video", notes: "" });
+  const [rescheduleSession, setRescheduleSession] = useState<any>(null);
 
-  const filtered = sessions.filter((s) => filter === "all" || s.status === filter);
+  const filtered = data.filter((s) => filter === "all" || s.status === filter);
 
   const book = () => {
     if (!form.date) { toast.error("Select a date"); return; }
-    toast.success(`Session booked with ${form.student} on ${form.date}!`);
+    
+    const newSession = {
+      id: Date.now(),
+      student: form.student,
+      type: form.type,
+      date: form.date,
+      time: form.time,
+      duration: "45 min",
+      mode: form.mode,
+      status: "upcoming",
+      notes: "Scheduled via Dashboard"
+    };
+
+    setData([newSession, ...data]);
+    toast.success(`Session booked with ${form.student}!`);
     setShowForm(false);
+  };
+
+  const completeSession = (id: number) => {
+    setData(data.map(s => s.id === id ? { ...s, status: "completed" } : s));
+    toast.success("Session completed and logged!");
   };
 
   return (
@@ -92,8 +115,8 @@ export default function CounselorSessions() {
               </div>
               {s.status === "upcoming" ? (
                 <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => toast.success(`Starting session with ${s.student}...`)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">Join</button>
-                  <button onClick={() => toast.info("Session rescheduled")} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors"><Clock className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => completeSession(s.id)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5"/> Complete</button>
+                  <button onClick={() => setRescheduleSession(s)} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors"><Clock className="w-3.5 h-3.5" /></button>
                 </div>
               ) : (
                 <span className="text-xs font-semibold text-accent flex items-center gap-1 flex-shrink-0">
@@ -104,6 +127,35 @@ export default function CounselorSessions() {
           </div>
         ))}
       </div>
+
+      {/* --- Reschedule Session Modal --- */}
+      <Dialog open={!!rescheduleSession} onOpenChange={(open) => !open && setRescheduleSession(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Reschedule Session</DialogTitle>
+          </DialogHeader>
+          {rescheduleSession && (
+            <div className="py-2 space-y-4">
+              <p className="text-sm text-muted-foreground">Pick a new date and time for your session with <strong className="text-foreground">{rescheduleSession.student}</strong>.</p>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">New Date</label>
+                <input type="date" defaultValue={rescheduleSession.date} className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">New Time</label>
+                <input type="time" defaultValue={rescheduleSession.time} className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRescheduleSession(null)}>Cancel</Button>
+            <Button onClick={() => { 
+              toast.success(`Session rescheduled successfully`); 
+              setRescheduleSession(null); 
+            }}>Update Schedule</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

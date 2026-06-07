@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { DollarSign, TrendingUp, Download, BarChart2 } from "lucide-react";
+import { DollarSign, TrendingUp, Download, BarChart2, CheckCircle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line } from "recharts";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const monthlyEarnings = [
   { month: "Jan", gross: 12000, net: 9600 }, { month: "Feb", gross: 15000, net: 12000 },
@@ -20,6 +22,30 @@ const transactions = [
 ];
 
 export default function TeacherEarnings() {
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [amount, setAmount] = useState(28000);
+  const [history, setHistory] = useState(transactions);
+
+  const handleWithdraw = () => {
+    toast.success(`Withdrawal of ₹${amount.toLocaleString()} initiated successfully!`);
+    setHistory([{ date: "Just now", desc: "Withdrawal to bank account", amount: -amount, type: "debit" }, ...history]);
+    setAmount(0);
+    setWithdrawOpen(false);
+  };
+
+  const exportCSV = () => {
+    const csvData = [
+      ["Date", "Description", "Amount", "Type"],
+      ...history.map(t => [t.date, t.desc, t.amount.toString(), t.type])
+    ].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Earnings_Statement.csv";
+    link.click();
+    toast.success("Statement downloaded successfully!");
+  };
+
   return (
     <DashboardLayout title="Earnings & Revenue" subtitle="Track your income, commissions, and payout history">
       {/* Stats */}
@@ -27,7 +53,7 @@ export default function TeacherEarnings() {
         {[
           { label: "Total Earnings", val: "₹1,83,950", sub: "All time" },
           { label: "This Month", val: "₹35,000", sub: "+25% vs last" },
-          { label: "Available Balance", val: "₹28,000", sub: "Ready to withdraw" },
+          { label: "Available Balance", val: `₹${amount.toLocaleString()}`, sub: amount > 0 ? "Ready to withdraw" : "Next payout on 1st" },
           { label: "Platform Fee", val: "20%", sub: "Per transaction" },
         ].map((s, i) => (
           <div key={i} className="bg-card border border-border rounded-2xl p-4">
@@ -73,16 +99,16 @@ export default function TeacherEarnings() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold">Transaction History</h3>
           <div className="flex gap-2">
-            <button onClick={() => toast.success("Downloading statement...")} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+            <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
               <Download className="w-3.5 h-3.5" /> Export
             </button>
-            <button onClick={() => toast.success("Initiating withdrawal of ₹28,000...")} className="flex items-center gap-2 px-3 py-1.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
-              Withdraw ₹28,000
+            <button onClick={() => setWithdrawOpen(true)} disabled={amount === 0} className="flex items-center gap-2 px-3 py-1.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 disabled:opacity-50">
+              Withdraw ₹{amount.toLocaleString()}
             </button>
           </div>
         </div>
         <div className="space-y-2">
-          {transactions.map((t, i) => (
+          {history.map((t, i) => (
             <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
               <div>
                 <p className="text-sm font-medium">{t.desc}</p>
@@ -95,6 +121,28 @@ export default function TeacherEarnings() {
           ))}
         </div>
       </div>
+
+      {/* Withdraw Modal */}
+      <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Request Payout</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <DollarSign className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-2xl mb-2 text-foreground">₹{amount.toLocaleString()}</h3>
+            <p className="text-sm text-muted-foreground mb-4">You are withdrawing your entire available balance. This amount will be transferred to your linked bank account ending in **3491**.</p>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setWithdrawOpen(false)}>Cancel</Button>
+            <Button onClick={handleWithdraw} className="bg-green-600 hover:bg-green-700 text-white gap-2">
+              <CheckCircle className="w-4 h-4" /> Confirm Transfer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, Star, TrendingUp, BookOpen, MessageSquare, Award } from "lucide-react";
+import { Search, Filter, Star, TrendingUp, BookOpen, MessageSquare, Award, Send, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const students = [
   { id: 1, name: "Rahul Sharma", initials: "RS", color: "bg-blue-500", class: "Class 12 (JEE)", email: "rahul@example.com", progress: 68, score: 78, attendance: 92, course: "Advanced Calculus for JEE", joined: "Mar 10, 2025", streak: 14 },
@@ -16,6 +18,9 @@ const students = [
 export default function TeacherStudents() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<typeof students[0] | null>(null);
+  const [msgOpen, setMsgOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const filtered = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -46,7 +51,7 @@ export default function TeacherStudents() {
                 </div>
               ))}
             </div>
-            <button onClick={() => toast.success(`Message sent to ${selected.name}!`)} className="w-full mt-4 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-2">
+            <button onClick={() => setMsgOpen(true)} className="w-full mt-4 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-2">
               <MessageSquare className="w-3.5 h-3.5" /> Send Message
             </button>
           </div>
@@ -85,11 +90,72 @@ export default function TeacherStudents() {
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => toast.success("Sending personalized feedback...")} className="flex-1 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">Send Feedback</button>
-              <button onClick={() => toast.success("Generating progress report...")} className="flex-1 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">Generate Report</button>
+              <button onClick={() => setFeedbackOpen(true)} className="flex-1 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">Send Feedback</button>
+              <button onClick={() => setReportOpen(true)} className="flex-1 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">Generate Report</button>
             </div>
           </div>
         </div>
+
+        {/* Modals */}
+        <Dialog open={msgOpen} onOpenChange={setMsgOpen}>
+          <DialogContent className="sm:max-w-[400px] bg-background">
+            <DialogHeader>
+              <DialogTitle>Message {selected.name}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <textarea placeholder="Type your message..." className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background min-h-[120px] focus:outline-none focus:ring-2 focus:ring-primary/30"></textarea>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setMsgOpen(false)}>Cancel</Button>
+              <Button onClick={() => { toast.success("Message sent successfully!"); setMsgOpen(false); }} className="gap-2"><Send className="w-4 h-4"/> Send</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+          <DialogContent className="sm:max-w-[425px] bg-background">
+            <DialogHeader>
+              <DialogTitle>Send Academic Feedback</DialogTitle>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Feedback Type</label>
+                <select className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background">
+                  <option>Performance Improvement</option>
+                  <option>Commendation / Praise</option>
+                  <option>Assignment Review</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Comments</label>
+                <textarea placeholder="Write constructive feedback for the student..." className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background min-h-[100px] focus:outline-none focus:ring-2 focus:ring-primary/30"></textarea>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setFeedbackOpen(false)}>Cancel</Button>
+              <Button onClick={() => { toast.success("Feedback recorded and shared with student!"); setFeedbackOpen(false); }}>Submit Feedback</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+          <DialogContent className="sm:max-w-[350px] bg-background text-center">
+            <DialogHeader>
+              <DialogTitle className="text-center">Generate Progress Report</DialogTitle>
+            </DialogHeader>
+            <div className="py-6 flex flex-col items-center">
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8" />
+              </div>
+              <p className="text-sm text-muted-foreground">This will generate a comprehensive PDF report covering attendance, assignment scores, and test performance for <strong className="text-foreground">{selected.name}</strong>.</p>
+            </div>
+            <DialogFooter className="sm:justify-center flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+              <Button onClick={() => { toast.success("Report generated and downloaded!"); setReportOpen(false); }}>Download PDF</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </DashboardLayout>
     );
   }

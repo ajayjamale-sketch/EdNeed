@@ -3,6 +3,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Plus, CheckSquare, Clock, AlertCircle, Users, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const initialAssignments = [
   { id: 1, title: "Integration by Parts — Problem Set", course: "Advanced Calculus for JEE", due: "Jun 10, 2025", submitted: 98, total: 120, graded: 72, status: "active" },
@@ -15,6 +17,8 @@ export default function TeacherAssignments() {
   const [assignments, setAssignments] = useState(initialAssignments);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", course: "Advanced Calculus for JEE", due: "" });
+  const [editAsg, setEditAsg] = useState<any>(null);
+  const [gradeAsg, setGradeAsg] = useState<any>(null);
 
   const create = () => {
     if (!form.title || !form.due) { toast.error("Fill all fields"); return; }
@@ -27,6 +31,18 @@ export default function TeacherAssignments() {
   const deleteAssignment = (id: number) => {
     setAssignments((prev) => prev.filter((a) => a.id !== id));
     toast.success("Assignment deleted");
+  };
+
+  const saveEdit = () => {
+    setAssignments((prev) => prev.map((a) => a.id === editAsg.id ? editAsg : a));
+    toast.success("Assignment updated!");
+    setEditAsg(null);
+  };
+
+  const processGrading = () => {
+    setAssignments((prev) => prev.map((a) => a.id === gradeAsg.id ? { ...a, graded: a.submitted, status: a.submitted === a.total ? "closed" : a.status } : a));
+    toast.success(`Graded all pending submissions for ${gradeAsg.title}!`);
+    setGradeAsg(null);
   };
 
   return (
@@ -99,11 +115,11 @@ export default function TeacherAssignments() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   {a.submitted > a.graded && (
-                    <button onClick={() => toast.success("Opening grading panel...")} className="px-3 py-1.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                    <button onClick={() => setGradeAsg(a)} className="px-3 py-1.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
                       Grade ({pending})
                     </button>
                   )}
-                  <button onClick={() => toast.success("Editing assignment...")} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors"><Edit className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEditAsg(a)} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors"><Edit className="w-3.5 h-3.5" /></button>
                   <button onClick={() => deleteAssignment(a.id)} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
@@ -111,6 +127,59 @@ export default function TeacherAssignments() {
           );
         })}
       </div>
+
+      {/* Modals */}
+      <Dialog open={!!editAsg} onOpenChange={(open) => !open && setEditAsg(null)}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Edit Assignment</DialogTitle>
+          </DialogHeader>
+          {editAsg && (
+            <div className="py-4 space-y-4">
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Assignment Title</label>
+                <input value={editAsg.title} onChange={(e) => setEditAsg({ ...editAsg, title: e.target.value })} className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Course</label>
+                <select value={editAsg.course} onChange={(e) => setEditAsg({ ...editAsg, course: e.target.value })} className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  {["Advanced Calculus for JEE", "Physics Mechanics", "Differential Equations"].map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Due Date</label>
+                <input type="date" value={editAsg.due} onChange={(e) => setEditAsg({ ...editAsg, due: e.target.value })} className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditAsg(null)}>Cancel</Button>
+            <Button onClick={saveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!gradeAsg} onOpenChange={(open) => !open && setGradeAsg(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Grade Submissions</DialogTitle>
+          </DialogHeader>
+          {gradeAsg && (
+            <div className="py-4 text-center">
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckSquare className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">{gradeAsg.title}</h3>
+              <p className="text-sm text-muted-foreground mb-4">You are about to bulk grade the <strong className="text-foreground">{gradeAsg.submitted - gradeAsg.graded} pending submissions</strong> for this assignment. (In a real app, this would open a detailed grading panel).</p>
+            </div>
+          )}
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setGradeAsg(null)}>Cancel</Button>
+            <Button onClick={processGrading}>Process Grades</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </DashboardLayout>
   );
 }

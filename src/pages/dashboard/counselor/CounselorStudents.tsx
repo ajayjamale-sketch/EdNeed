@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Users, Search, TrendingUp, Target, Calendar, MessageSquare, Plus } from "lucide-react";
+import { Users, Search, TrendingUp, Target, Calendar, MessageSquare, Plus, FileText, Clock, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const students = [
   { id: 1, name: "Rahul Mehta", class: "12 Science", target: "IIT/NIT — Engineering", assessment: "92% Engineering", nextSession: "Jun 5", status: "on-track", initials: "RM", color: "bg-blue-500", progress: 72 },
@@ -20,10 +22,41 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 export default function CounselorStudents() {
+  const [data, setData] = useState(students);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filtered = students.filter((s) => {
+  const [viewStudent, setViewStudent] = useState<any>(null);
+  const [scheduleStudent, setScheduleStudent] = useState<any>(null);
+  const [messageStudent, setMessageStudent] = useState<any>(null);
+  
+  const [showAssign, setShowAssign] = useState(false);
+  const [assignForm, setAssignForm] = useState({ name: "", class: "", target: "" });
+
+  const handleAssign = () => {
+    if (!assignForm.name || !assignForm.class || !assignForm.target) {
+      toast.error("Please fill all fields");
+      return;
+    }
+    const newStudent = {
+      id: Date.now(),
+      name: assignForm.name,
+      class: assignForm.class,
+      target: assignForm.target,
+      assessment: "Pending Assessment",
+      nextSession: "Not scheduled",
+      status: "needs-attention",
+      initials: assignForm.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() || "ST",
+      color: "bg-blue-500",
+      progress: 0
+    };
+    setData([newStudent, ...data]);
+    setShowAssign(false);
+    setAssignForm({ name: "", class: "", target: "" });
+    toast.success("Student successfully assigned to your roster!");
+  };
+
+  const filtered = data.filter((s) => {
     const m = s.name.toLowerCase().includes(search.toLowerCase()) || s.target.toLowerCase().includes(search.toLowerCase());
     const f = statusFilter === "all" || s.status === statusFilter;
     return m && f;
@@ -42,7 +75,7 @@ export default function CounselorStudents() {
           <option value="excellent">Excellent</option>
           <option value="needs-attention">Needs Attention</option>
         </select>
-        <button onClick={() => toast.success("Adding new student assignment...")} className="flex items-center gap-2 px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 whitespace-nowrap">
+        <button onClick={() => setShowAssign(true)} className="flex items-center gap-2 px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 whitespace-nowrap">
           <Plus className="w-4 h-4" /> Assign Student
         </button>
       </div>
@@ -51,7 +84,7 @@ export default function CounselorStudents() {
         {filtered.map((s) => {
           const cfg = statusConfig[s.status];
           return (
-            <div key={s.id} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/30 card-hover cursor-pointer" onClick={() => toast.success(`Opening ${s.name}'s profile...`)}>
+            <div key={s.id} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/30 card-hover cursor-pointer" onClick={() => setViewStudent(s)}>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={cn("w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0", s.color)}>{s.initials}</div>
@@ -83,10 +116,10 @@ export default function CounselorStudents() {
               </div>
 
               <div className="flex gap-2">
-                <button onClick={(e) => { e.stopPropagation(); toast.success(`Scheduling session with ${s.name}...`); }} className="flex-1 py-2 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-1">
+                <button onClick={(e) => { e.stopPropagation(); setScheduleStudent(s); }} className="flex-1 py-2 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-1">
                   <Calendar className="w-3 h-3" /> Session: {s.nextSession}
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); toast.success(`Messaging ${s.name}...`); }} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0">
+                <button onClick={(e) => { e.stopPropagation(); setMessageStudent(s); }} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0">
                   <MessageSquare className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -94,6 +127,147 @@ export default function CounselorStudents() {
           );
         })}
       </div>
+
+      {/* --- View Student Profile Modal --- */}
+      <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Counseling Profile</DialogTitle>
+          </DialogHeader>
+          {viewStudent && (
+            <div className="py-2">
+              <div className="flex items-center gap-4 mb-5 p-4 rounded-xl border border-border bg-muted/30">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0", viewStudent.color)}>{viewStudent.initials}</div>
+                <div>
+                  <h3 className="font-bold text-lg">{viewStudent.name}</h3>
+                  <div className="text-sm text-muted-foreground">{viewStudent.class}</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-card border border-border rounded-xl p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Target Career</div>
+                    <div className="font-semibold text-sm">{viewStudent.target}</div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Preparation Progress</div>
+                    <div className="font-semibold text-sm text-primary">{viewStudent.progress}% Complete</div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Recent Assessments</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 border border-border rounded-xl text-sm">
+                      <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /> {viewStudent.assessment}</div>
+                      <span className="text-green-600 font-semibold text-xs bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-md">Score: 88%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Upcoming Schedule</h4>
+                  <div className="flex items-center justify-between p-3 border border-primary/20 bg-primary/5 rounded-xl text-sm">
+                    <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> 1-on-1 Mentorship Session</div>
+                    <span className="text-primary font-semibold text-xs">{viewStudent.nextSession}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewStudent(null)}>Close</Button>
+            {viewStudent && (
+              <Button onClick={() => { setScheduleStudent(viewStudent); setViewStudent(null); }} className="gap-2">
+                <Calendar className="w-4 h-4" /> Schedule Session
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- Schedule Session Modal --- */}
+      <Dialog open={!!scheduleStudent} onOpenChange={(open) => !open && setScheduleStudent(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Schedule Counseling Session</DialogTitle>
+          </DialogHeader>
+          {scheduleStudent && (
+            <div className="py-2 space-y-4">
+              <p className="text-sm text-muted-foreground">Book a new 1-on-1 session with <strong className="text-foreground">{scheduleStudent.name}</strong>.</p>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Date</label>
+                <input type="date" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Time</label>
+                <input type="time" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Agenda / Notes</label>
+                <input type="text" placeholder="e.g. Reviewing mock test scores" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setScheduleStudent(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Session scheduled with ${scheduleStudent?.name}`); setScheduleStudent(null); }}>Book Session</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- Message Student Modal --- */}
+      <Dialog open={!!messageStudent} onOpenChange={(open) => !open && setMessageStudent(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Message Student</DialogTitle>
+          </DialogHeader>
+          {messageStudent && (
+            <div className="py-2">
+              <p className="text-sm text-muted-foreground mb-4">Send a direct message to <strong className="text-foreground">{messageStudent.name}</strong>.</p>
+              <textarea 
+                className="w-full h-32 px-3 py-3 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" 
+                placeholder="Type your message here..."
+                defaultValue={`Hi ${messageStudent.name.split(' ')[0]},\n\nPlease make sure to complete your remaining assessments before our next session on ${messageStudent.nextSession}.`}
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMessageStudent(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Message sent to ${messageStudent.name}`); setMessageStudent(null); }} className="gap-2">
+              <Send className="w-4 h-4" /> Send Message
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* --- Assign Student Modal --- */}
+      <Dialog open={showAssign} onOpenChange={setShowAssign}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Assign New Student</DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-4">
+            <p className="text-sm text-muted-foreground">Add a new student to your counseling roster.</p>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Student Name *</label>
+              <input value={assignForm.name} onChange={(e) => setAssignForm({...assignForm, name: e.target.value})} placeholder="e.g. Rohan Sharma" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Class / Grade *</label>
+              <input value={assignForm.class} onChange={(e) => setAssignForm({...assignForm, class: e.target.value})} placeholder="e.g. 11 Science" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Target Career / Goal *</label>
+              <input value={assignForm.target} onChange={(e) => setAssignForm({...assignForm, target: e.target.value})} placeholder="e.g. Architecture" className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAssign(false)}>Cancel</Button>
+            <Button onClick={handleAssign}>Assign Student</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Target, BarChart2, Brain, Globe } from "lucide-react";
+import { Target, BarChart2, Brain, Globe, CheckCircle, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const questions = [
   { q: "What subjects excite this student?", options: ["Mathematics & Science", "Biology & Chemistry", "Social Studies & History", "Arts & Creative subjects"] },
@@ -24,6 +26,10 @@ export default function CounselorAssessments() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [done, setDone] = useState(false);
   const [tab, setTab] = useState<"assessment" | "opportunities">("assessment");
+  
+  const [viewOpp, setViewOpp] = useState<any>(null);
+  const [recommendOpp, setRecommendOpp] = useState<any>(null);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
   const handleAnswer = (idx: number) => {
     const newAnswers = [...answers, idx];
@@ -122,14 +128,107 @@ export default function CounselorAssessments() {
                   <span className="text-muted-foreground">Deadline: {o.deadline}</span>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => toast.success(`Recommending "${o.title}" to matched students...`)} className="flex-1 py-2 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">Recommend to Students</button>
-                  <button onClick={() => toast.success("Opening opportunity details...")} className="flex-1 py-2 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">View Details</button>
+                  <button onClick={() => setRecommendOpp(o)} className="flex-1 py-2 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">Recommend to Students</button>
+                  <button onClick={() => setViewOpp(o)} className="flex-1 py-2 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">View Details</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* --- View Opportunity Modal --- */}
+      <Dialog open={!!viewOpp} onOpenChange={(open) => !open && setViewOpp(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Opportunity Details</DialogTitle>
+          </DialogHeader>
+          {viewOpp && (
+            <div className="py-2 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white flex-shrink-0">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">{viewOpp.title}</h3>
+                  <p className="text-sm text-muted-foreground">{viewOpp.org}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-card border border-border rounded-xl p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Type</div>
+                  <div className="font-semibold text-sm">{viewOpp.type}</div>
+                </div>
+                <div className="bg-card border border-border rounded-xl p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Category</div>
+                  <div className="font-semibold text-sm">{viewOpp.category}</div>
+                </div>
+                <div className="bg-card border border-border rounded-xl p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Match Score</div>
+                  <div className="font-semibold text-sm text-primary">{viewOpp.match}% Match</div>
+                </div>
+                <div className="bg-card border border-border rounded-xl p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Deadline</div>
+                  <div className="font-semibold text-sm">{viewOpp.deadline}</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+                This {viewOpp.type.toLowerCase()} is highly recommended for students focusing on {viewOpp.category}. It provides excellent exposure and aligns perfectly with aptitude scores &gt; 80%.
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewOpp(null)}>Close</Button>
+            {viewOpp && (
+              <Button onClick={() => { setRecommendOpp(viewOpp); setViewOpp(null); }}>Recommend Opportunity</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- Recommend Opportunity Modal --- */}
+      <Dialog open={!!recommendOpp} onOpenChange={(open) => !open && setRecommendOpp(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Recommend Opportunity</DialogTitle>
+          </DialogHeader>
+          {recommendOpp && (
+            <div className="py-2 space-y-4">
+              <p className="text-sm text-muted-foreground">Select students to recommend <strong className="text-foreground">"{recommendOpp.title}"</strong> to:</p>
+              <div className="space-y-2 border border-border rounded-xl p-3 max-h-[200px] overflow-y-auto">
+                {["Rahul Mehta", "Ananya Reddy", "Siddharth Rao", "Kavya Nair", "Arjun Iyer"].map(student => (
+                  <label key={student} className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer transition-colors">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30"
+                      checked={selectedStudents.includes(student)}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedStudents([...selectedStudents, student]);
+                        else setSelectedStudents(selectedStudents.filter(s => s !== student));
+                      }}
+                    />
+                    <span className="text-sm font-medium">{student}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRecommendOpp(null)}>Cancel</Button>
+            <Button onClick={() => { 
+              if (selectedStudents.length === 0) {
+                toast.error("Please select at least one student");
+                return;
+              }
+              toast.success(`Sent recommendation to ${selectedStudents.length} students!`); 
+              setRecommendOpp(null);
+              setSelectedStudents([]);
+            }} className="gap-2">
+              <Send className="w-4 h-4" /> Send Recommendation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

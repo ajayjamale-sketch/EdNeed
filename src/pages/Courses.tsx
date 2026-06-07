@@ -1,12 +1,14 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Search, Filter, Star, Users, Clock, Play, BookOpen, ChevronRight,
   Zap, Award, TrendingUp, ArrowRight, CheckCircle, Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const categories = [
   "All", "JEE / NEET", "School Curriculum", "Skill Development",
@@ -52,9 +54,23 @@ const stats = [
 ];
 
 export default function Courses() {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("popular");
+  
+  // Mock auth state for MVP
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [payModalOpen, setPayModalOpen] = useState<any>(null);
+
+  const handleEnroll = (course: any) => {
+    if (!isLoggedIn) {
+      toast.error("Please sign in to enroll in courses");
+      navigate("/login");
+    } else {
+      setPayModalOpen(course);
+    }
+  };
 
   const filtered = courses.filter((c) => {
     const matchCat = activeCategory === "All" || c.category === activeCategory;
@@ -72,6 +88,18 @@ export default function Courses() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
               <BookOpen className="w-4 h-4" /> 15,000+ Courses Available
             </div>
+            
+            <div className="mb-4 flex justify-center items-center gap-2 bg-muted/50 w-max mx-auto px-4 py-2 rounded-xl">
+              <span className="text-sm font-medium">Demo Auth Status:</span>
+              <button 
+                onClick={() => { setIsLoggedIn(!isLoggedIn); toast.success(isLoggedIn ? "Logged out" : "Logged in"); }}
+                className={cn("text-xs px-2 py-1 rounded font-bold transition-colors", isLoggedIn ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}
+              >
+                {isLoggedIn ? "LOGGED IN" : "LOGGED OUT"}
+              </button>
+              <span className="text-xs text-muted-foreground ml-2">(Click to toggle)</span>
+            </div>
+
             <h1 className="text-4xl lg:text-5xl font-bold font-heading mb-5 leading-tight">
               Learn Anything, <span className="gradient-text">Achieve Everything</span>
             </h1>
@@ -186,7 +214,7 @@ export default function Courses() {
                       <span className="text-xs text-muted-foreground line-through">₹{course.originalPrice.toLocaleString()}</span>
                     </div>
                     <button
-                      onClick={() => toast.success(`Added "${course.title}" to cart!`)}
+                      onClick={() => handleEnroll(course)}
                       className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity"
                     >
                       Enroll
@@ -305,6 +333,47 @@ export default function Courses() {
           </div>
         </div>
       </section>
+
+      {/* Payment Modal */}
+      <Dialog open={!!payModalOpen} onOpenChange={(open) => !open && setPayModalOpen(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Complete Purchase</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-2xl mb-1 text-foreground">₹{payModalOpen?.price.toLocaleString()}</h3>
+            <p className="text-sm font-semibold mb-1 text-foreground">{payModalOpen?.title}</p>
+            <p className="text-xs text-muted-foreground mb-4">By {payModalOpen?.instructor}</p>
+            
+            <div className="text-left bg-muted p-4 rounded-xl mb-4">
+              <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Original Price</span><span className="font-medium line-through">₹{payModalOpen?.originalPrice.toLocaleString()}</span></div>
+              <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Discount</span><span className="font-medium text-green-600">-₹{(payModalOpen?.originalPrice - payModalOpen?.price).toLocaleString()}</span></div>
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2"><span>Total Amount</span><span>₹{payModalOpen?.price.toLocaleString()}</span></div>
+            </div>
+            
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-left mb-2">Select Payment Method</p>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer bg-primary/5 border-primary/30">
+                <div className="w-4 h-4 rounded-full border-[5px] border-primary flex-shrink-0" />
+                <span className="text-sm font-semibold">Credit/Debit Card</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50">
+                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" />
+                <span className="text-sm font-medium text-muted-foreground">UPI / Google Pay</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setPayModalOpen(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Successfully enrolled in ${payModalOpen.title}!`); setPayModalOpen(null); }} className="bg-primary hover:bg-primary/90 text-white w-full">
+              Pay ₹{payModalOpen?.price.toLocaleString()}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

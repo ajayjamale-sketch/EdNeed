@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Database, Search, Shield, AlertTriangle, Info, Terminal, Calendar, ArrowDownCircle } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const mockLogs = [
   { id: "log-1", type: "Security", message: "Multiple failed login attempts detected", source: "Auth Service", timestamp: "10 mins ago", level: "critical" },
@@ -14,8 +15,25 @@ const mockLogs = [
 
 export default function AdminLogs() {
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-  const filtered = mockLogs.filter(log => filter === "all" || log.level === filter);
+  const filtered = mockLogs.filter(log => {
+    const matchesFilter = filter === "all" || log.level === filter;
+    const matchesSearch = log.message.toLowerCase().includes(search.toLowerCase()) || log.source.toLowerCase().includes(search.toLowerCase()) || log.type.toLowerCase().includes(search.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  const handleExport = () => {
+    const headers = ["ID,Type,Level,Source,Message,Timestamp"];
+    const csvData = filtered.map(l => `${l.id},${l.type},${l.level},${l.source},"${l.message}",${l.timestamp}`);
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "platform_logs_export.csv";
+    a.click();
+    toast.success("Logs exported successfully");
+  };
 
   return (
     <DashboardLayout title="Platform Logs" subtitle="System events, security audits, and activity logs">
@@ -27,6 +45,8 @@ export default function AdminLogs() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search logs by keyword or trace ID..."
               className="w-full pl-9 pr-4 py-2 bg-muted border-transparent rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
@@ -46,7 +66,7 @@ export default function AdminLogs() {
                 </button>
               ))}
             </div>
-            <button className="px-4 py-2 border border-border bg-card text-foreground rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-muted transition-colors">
+            <button onClick={handleExport} className="px-4 py-2 border border-border bg-card text-foreground rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-muted transition-colors">
               <ArrowDownCircle className="w-4 h-4" />
               <span className="hidden sm:inline">Export</span>
             </button>

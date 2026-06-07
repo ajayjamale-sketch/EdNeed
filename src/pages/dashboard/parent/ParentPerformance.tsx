@@ -4,6 +4,8 @@ import { BarChart2, TrendingUp, TrendingDown, Award, BookOpen, Search } from "lu
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from "recharts";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const monthlyData = [
   { month: "Jan", riya: 72, aryan: 65 }, { month: "Feb", riya: 76, aryan: 68 },
@@ -29,6 +31,7 @@ const examResults = [
 
 export default function ParentPerformance() {
   const [selected, setSelected] = useState<"riya" | "aryan">("riya");
+  const [reportOpen, setReportOpen] = useState<any>(null);
   const name = selected === "riya" ? "Riya" : "Aryan";
 
   return (
@@ -117,7 +120,7 @@ export default function ParentPerformance() {
           <h3 className="font-semibold mb-4">Recent Exams & Tests</h3>
           <div className="space-y-3">
             {examResults.map((e, i) => (
-              <div key={i} className="p-3 rounded-xl border border-border hover:border-primary/30 transition-colors cursor-pointer" onClick={() => toast.success(`Opening ${e.exam} report...`)}>
+              <div key={i} className="p-3 rounded-xl border border-border hover:border-primary/30 transition-colors cursor-pointer" onClick={() => setReportOpen(e)}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-semibold">{e.exam}</span>
                   <span className="text-xs bg-muted px-2 py-0.5 rounded-full">{e.type}</span>
@@ -129,6 +132,37 @@ export default function ParentPerformance() {
           </div>
         </div>
       </div>
+
+      <Dialog open={!!reportOpen} onOpenChange={(open) => !open && setReportOpen(null)}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>{reportOpen?.exam} Details</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div className="flex justify-between pb-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Student</span>
+              <span className="text-sm font-semibold">{name} Kumar</span>
+            </div>
+            <div className="flex justify-between pb-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Date Taken</span>
+              <span className="text-sm font-medium">{reportOpen?.date}</span>
+            </div>
+            <div className="flex justify-between pb-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Score & Grade</span>
+              <span className="text-sm font-bold text-primary">{selected === "riya" ? reportOpen?.riya : reportOpen?.aryan}</span>
+            </div>
+            <div className="pt-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Teacher's Note: {name} has shown a good understanding of the core concepts in this assessment. Continued practice with advanced problem sets is recommended to improve the score further.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportOpen(null)}>Close</Button>
+            <Button onClick={() => { toast.success("Downloading full PDF report..."); setReportOpen(null); }}>Download PDF</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

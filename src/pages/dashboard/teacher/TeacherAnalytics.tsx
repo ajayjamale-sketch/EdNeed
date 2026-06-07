@@ -1,3 +1,4 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { BarChart2, TrendingUp, Users, BookOpen, Star, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line } from "recharts";
@@ -8,15 +9,30 @@ const coursePerformance = [
   { course: "Diff Eq.", completion: 40, rating: 4.7, dropoff: 22 },
 ];
 
-const enrollmentTrend = [
-  { month: "Jan", students: 120 }, { month: "Feb", students: 180 },
-  { month: "Mar", students: 240 }, { month: "Apr", students: 320 },
-  { month: "May", students: 410 }, { month: "Jun", students: 510 },
-];
+const enrollmentTrend = {
+  "Last 30 Days": [
+    { month: "Week 1", students: 10 }, { month: "Week 2", students: 25 },
+    { month: "Week 3", students: 45 }, { month: "Week 4", students: 85 },
+  ],
+  "This Year": [
+    { month: "Jan", students: 120 }, { month: "Feb", students: 180 },
+    { month: "Mar", students: 240 }, { month: "Apr", students: 320 },
+    { month: "May", students: 410 }, { month: "Jun", students: 510 },
+  ]
+};
 
 export default function TeacherAnalytics() {
+  const [timeframe, setTimeframe] = useState<"This Year" | "Last 30 Days">("This Year");
+
   return (
     <DashboardLayout title="Teaching Analytics" subtitle="Insights into course performance and student engagement">
+      <div className="flex justify-end mb-4">
+        <select value={timeframe} onChange={(e) => setTimeframe(e.target.value as any)} className="px-3 py-2 border border-border rounded-xl text-sm bg-background font-medium focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <option>Last 30 Days</option>
+          <option>This Year</option>
+        </select>
+      </div>
+      
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { label: "Total Students", val: "3,679", icon: Users, color: "text-blue-500" },
@@ -49,7 +65,7 @@ export default function TeacherAnalytics() {
         <div className="bg-card border border-border rounded-2xl p-5">
           <h3 className="font-semibold mb-4">Student Enrollment Growth</h3>
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={enrollmentTrend}>
+            <LineChart data={enrollmentTrend[timeframe]}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />

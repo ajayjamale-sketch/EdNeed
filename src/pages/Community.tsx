@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Users, MessageSquare, BookOpen, Trophy, Heart, Search,
   Plus, ThumbsUp, Share2, ChevronRight, ArrowRight, Zap,
@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const studyGroups = [
   { id: 1, name: "JEE 2026 Warriors", subject: "JEE Prep", members: 4820, posts: 1230, active: true, tag: "Competitive Exams", description: "Daily problem-solving sessions for JEE Main and Advanced aspirants.", emoji: "⚡" },
@@ -39,6 +41,89 @@ export default function Community() {
   const [activeTag, setActiveTag] = useState("All Topics");
   const [search, setSearch] = useState("");
   const [liked, setLiked] = useState<Set<number>>(new Set());
+
+  // Dialog and form states
+  const navigate = useNavigate();
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [showNewPost, setShowNewPost] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
+
+  const [groupPref, setGroupPref] = useState("instantly");
+  const [postForm, setPostForm] = useState({ title: "", tag: "JEE", content: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isLoggedIn = (() => {
+    try {
+      const stored = localStorage.getItem("edneed-user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        return !!(user && user.role);
+      }
+    } catch { /* ignore */ }
+    return false;
+  })();
+
+  const handleJoinGroupClick = (group: any) => {
+    if (!isLoggedIn) {
+      toast.error("Please log in or register to join study groups.");
+      navigate("/register");
+      return;
+    }
+    setSelectedGroup(group);
+  };
+
+  const handleNewPostClick = () => {
+    if (!isLoggedIn) {
+      toast.error("Please log in or register to create discussions.");
+      navigate("/register");
+      return;
+    }
+    setShowNewPost(true);
+  };
+
+  const handleJoinChallengeClick = (challenge: any) => {
+    if (!isLoggedIn) {
+      toast.error("Please log in or register to join challenges.");
+      navigate("/register");
+      return;
+    }
+    setSelectedChallenge(challenge);
+  };
+
+  const submitJoinGroup = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success(`Successfully joined "${selectedGroup.name}"!`);
+      setSelectedGroup(null);
+    }, 1200);
+  };
+
+  const submitNewPost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!postForm.title || !postForm.content) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Post published successfully!");
+      setShowNewPost(false);
+      setPostForm({ title: "", tag: "JEE", content: "" });
+    }, 1200);
+  };
+
+  const submitJoinChallenge = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success(`Registered for "${selectedChallenge.title}" challenge!`);
+      setSelectedChallenge(null);
+    }, 1200);
+  };
 
   const toggleLike = (id: number) => {
     setLiked((prev) => {
@@ -129,7 +214,7 @@ export default function Community() {
                   <span className="flex items-center gap-1"><Users className="w-3 h-3" />{group.members.toLocaleString()} members</span>
                   <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{group.posts.toLocaleString()} posts</span>
                 </div>
-                <button onClick={() => toast.success(`Joined ${group.name}!`)} className="w-full py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                <button onClick={() => handleJoinGroupClick(group)} className="w-full py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
                   Join Group
                 </button>
               </div>
@@ -143,7 +228,7 @@ export default function Community() {
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold font-heading">Trending <span className="gradient-text">Discussions</span></h2>
-            <button onClick={() => toast.success("Open new discussion form...")} className="flex items-center gap-2 px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90">
+            <button onClick={handleNewPostClick} className="flex items-center gap-2 px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90">
               <Plus className="w-4 h-4" /> New Post
             </button>
           </div>
@@ -201,7 +286,7 @@ export default function Community() {
                 <div className="text-xs text-muted-foreground mb-1"><Users className="w-3 h-3 inline mr-1" />{c.participants.toLocaleString()} participants</div>
                 <div className="text-xs text-muted-foreground mb-1"><Bell className="w-3 h-3 inline mr-1" />Ends: {c.deadline}</div>
                 <div className="text-xs font-semibold text-accent mb-4"><Trophy className="w-3 h-3 inline mr-1" />{c.prize}</div>
-                <button onClick={() => toast.success(`Joined: ${c.title}!`)} className="w-full py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                <button onClick={() => handleJoinChallengeClick(c)} className="w-full py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
                   Join Challenge
                 </button>
               </div>
@@ -289,6 +374,135 @@ export default function Community() {
           </div>
         </div>
       </section>
+      {/* Join Group Dialog */}
+      <Dialog open={!!selectedGroup} onOpenChange={(open) => !open && setSelectedGroup(null)}>
+        <DialogContent className="sm:max-w-[420px] bg-background border border-border rounded-3xl p-6 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Join Study Group</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              You are joining <strong className="text-foreground">{selectedGroup?.name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={submitJoinGroup} className="space-y-4 py-3">
+            <div>
+              <label className="block text-xs font-semibold mb-2 text-muted-foreground">Notification Preferences</label>
+              <div className="space-y-2">
+                {[
+                  { value: "instantly", label: "Instant notifications for all posts" },
+                  { value: "daily", label: "Daily digest summary" },
+                  { value: "mentions", label: "Only notify on @mentions" },
+                ].map((pref) => (
+                  <label key={pref.value} className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted transition-colors">
+                    <input
+                      type="radio"
+                      name="group-pref"
+                      value={pref.value}
+                      checked={groupPref === pref.value}
+                      onChange={() => setGroupPref(pref.value)}
+                      className="text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm font-medium">{pref.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <DialogFooter className="pt-4 flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setSelectedGroup(null)} className="rounded-xl border border-border">Cancel</Button>
+              <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-primary text-white hover:bg-primary/90 flex-1">
+                {isSubmitting ? "Joining..." : "Confirm & Join"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* New Post Dialog */}
+      <Dialog open={showNewPost} onOpenChange={(open) => !open && setShowNewPost(false)}>
+        <DialogContent className="sm:max-w-[500px] bg-background border border-border rounded-3xl p-6 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Create New Discussion Post</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Share your thoughts, ask questions, or provide resource suggestions.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={submitNewPost} className="space-y-4 py-3">
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-muted-foreground">Post Title</label>
+              <input
+                type="text"
+                required
+                value={postForm.title}
+                onChange={(e) => setPostForm(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                placeholder="What would you like to discuss?"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-muted-foreground">Topic Tag</label>
+              <select
+                value={postForm.tag}
+                onChange={(e) => setPostForm(prev => ({ ...prev, tag: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {["JEE", "NEET", "CBSE", "UPSC", "Coding", "Study Tips", "Resources", "Motivation"].map(tag => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-muted-foreground">Content</label>
+              <textarea
+                required
+                rows={4}
+                value={postForm.content}
+                onChange={(e) => setPostForm(prev => ({ ...prev, content: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                placeholder="Write your post details here..."
+              />
+            </div>
+            <DialogFooter className="pt-4 flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setShowNewPost(false)} className="rounded-xl border border-border">Cancel</Button>
+              <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-primary text-white hover:bg-primary/90 flex-1">
+                {isSubmitting ? "Publishing..." : "Publish Post"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Join Challenge Dialog */}
+      <Dialog open={!!selectedChallenge} onOpenChange={(open) => !open && setSelectedChallenge(null)}>
+        <DialogContent className="sm:max-w-[420px] bg-background border border-border rounded-3xl p-6 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Join Challenge</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Are you ready to join the <strong className="text-foreground">{selectedChallenge?.title}</strong> challenge?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-2 text-sm">
+            <div className="flex justify-between border-b border-border pb-2">
+              <span className="text-muted-foreground">Prize:</span>
+              <span className="font-semibold text-accent">{selectedChallenge?.prize}</span>
+            </div>
+            <div className="flex justify-between border-b border-border pb-2">
+              <span className="text-muted-foreground">Deadline:</span>
+              <span className="font-semibold">{selectedChallenge?.deadline}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Current Participants:</span>
+              <span className="font-semibold">{selectedChallenge?.participants.toLocaleString()} students</span>
+            </div>
+          </div>
+          <form onSubmit={submitJoinChallenge}>
+            <DialogFooter className="pt-4 flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setSelectedChallenge(null)} className="rounded-xl border border-border">Cancel</Button>
+              <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-primary text-white hover:bg-primary/90 flex-1">
+                {isSubmitting ? "Joining..." : "Accept Challenge"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

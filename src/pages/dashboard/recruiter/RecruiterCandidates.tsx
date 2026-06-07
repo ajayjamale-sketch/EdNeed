@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, CheckSquare, X, Star, MessageSquare, Download, Eye } from "lucide-react";
+import { Search, Filter, CheckSquare, X, Star, MessageSquare, Download, Eye, FileText, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const candidates = [
   { id: 1, name: "Rahul Sharma", role: "Software Engineering Intern", skills: ["Python", "React", "ML", "Git"], cgpa: 9.1, college: "IIT Delhi", year: "3rd Year B.Tech", status: "shortlisted", initials: "RS", color: "bg-blue-500" },
@@ -25,6 +27,9 @@ export default function RecruiterCandidates() {
   const [data, setData] = useState(candidates);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const [viewCandidate, setViewCandidate] = useState<any>(null);
+  const [messageCandidate, setMessageCandidate] = useState<any>(null);
 
   const filtered = data.filter((c) => {
     const m = c.name.toLowerCase().includes(search.toLowerCase()) || c.skills.some((s) => s.toLowerCase().includes(search.toLowerCase())) || c.college.toLowerCase().includes(search.toLowerCase());
@@ -75,7 +80,7 @@ export default function RecruiterCandidates() {
                   {c.skills.map((s) => <span key={s} className="text-xs bg-muted px-2.5 py-0.5 rounded-full">{s}</span>)}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => toast.success(`Opening ${c.name}'s full profile...`)} className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">
+                  <button onClick={() => setViewCandidate(c)} className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">
                     <Eye className="w-3 h-3" /> View Profile
                   </button>
                   {c.status === "applied" && (
@@ -93,7 +98,7 @@ export default function RecruiterCandidates() {
                       Send Offer
                     </button>
                   )}
-                  <button onClick={() => toast.success(`Message sent to ${c.name}!`)} className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">
+                  <button onClick={() => setMessageCandidate(c)} className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">
                     <MessageSquare className="w-3 h-3" /> Message
                   </button>
                   {c.status !== "rejected" && c.status !== "offered" && (
@@ -107,6 +112,86 @@ export default function RecruiterCandidates() {
           </div>
         ))}
       </div>
+
+      {/* --- View Candidate Profile Modal --- */}
+      <Dialog open={!!viewCandidate} onOpenChange={(open) => !open && setViewCandidate(null)}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Candidate Profile</DialogTitle>
+          </DialogHeader>
+          {viewCandidate && (
+            <div className="py-2">
+              <div className="flex items-center gap-4 mb-5 p-4 rounded-xl border border-border bg-muted/30">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0", viewCandidate.color)}>{viewCandidate.initials}</div>
+                <div>
+                  <h3 className="font-bold text-lg">{viewCandidate.name}</h3>
+                  <div className="text-sm text-muted-foreground">{viewCandidate.college} • {viewCandidate.year}</div>
+                  <div className="flex gap-2 mt-1.5">
+                    <span className="text-xs font-bold text-accent">CGPA: {viewCandidate.cgpa}</span>
+                    <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full capitalize", statusColors[viewCandidate.status])}>{viewCandidate.status}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Applied For</h4>
+                  <p className="text-sm bg-card border border-border rounded-xl p-3">{viewCandidate.role}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Verified Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {viewCandidate.skills.map((s: string) => <span key={s} className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">{s}</span>)}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Documents</h4>
+                  <div className="flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
+                    <FileText className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm font-semibold">Resume_2025.pdf</div>
+                      <div className="text-xs text-muted-foreground">Updated 2 days ago</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewCandidate(null)}>Close</Button>
+            {viewCandidate && (
+              <Button onClick={() => { setMessageCandidate(viewCandidate); setViewCandidate(null); }} className="gap-2">
+                <MessageSquare className="w-4 h-4" /> Message
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- Send Message Modal --- */}
+      <Dialog open={!!messageCandidate} onOpenChange={(open) => !open && setMessageCandidate(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Message Candidate</DialogTitle>
+          </DialogHeader>
+          {messageCandidate && (
+            <div className="py-2">
+              <p className="text-sm text-muted-foreground mb-4">Send a direct message to <strong className="text-foreground">{messageCandidate.name}</strong>. They will be notified via email and the platform.</p>
+              <textarea 
+                className="w-full h-32 px-3 py-3 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" 
+                placeholder="Type your message here..."
+                defaultValue={`Hi ${messageCandidate.name.split(' ')[0]},\n\nWe have reviewed your application for the ${messageCandidate.role} position...`}
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMessageCandidate(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Message sent to ${messageCandidate.name}`); setMessageCandidate(null); }} className="gap-2">
+              <Send className="w-4 h-4" /> Send Message
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

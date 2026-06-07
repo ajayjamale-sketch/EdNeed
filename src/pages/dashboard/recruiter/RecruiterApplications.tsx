@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, MessageSquare, CheckSquare, Clock } from "lucide-react";
+import { Search, MessageSquare, CheckSquare, Clock, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const applications = [
   { id: 1, candidate: "Rahul Sharma", role: "Software Engineering Intern", college: "IIT Delhi", cgpa: 9.1, applied: "Jun 1, 2025", status: "shortlisted", initials: "RS", color: "bg-blue-500" },
@@ -24,6 +26,8 @@ export default function RecruiterApplications() {
   const [data, setData] = useState(applications);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const [messageCandidate, setMessageCandidate] = useState<any>(null);
 
   const filtered = data.filter((a) => {
     const m = a.candidate.toLowerCase().includes(search.toLowerCase()) || a.role.toLowerCase().includes(search.toLowerCase());
@@ -69,12 +73,37 @@ export default function RecruiterApplications() {
                 {a.status === "applied" && <button onClick={() => updateStatus(a.id, "shortlisted")} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90"><CheckSquare className="w-3 h-3 inline mr-1" />Shortlist</button>}
                 {a.status === "shortlisted" && <button onClick={() => updateStatus(a.id, "interviewed")} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90"><Clock className="w-3 h-3 inline mr-1" />Interview</button>}
                 {a.status === "interviewed" && <button onClick={() => updateStatus(a.id, "offered")} className="px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-semibold hover:opacity-90">Send Offer</button>}
-                <button onClick={() => toast.success(`Message sent to ${a.candidate}`)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><MessageSquare className="w-3.5 h-3.5" /></button>
+                <button onClick={() => setMessageCandidate(a)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><MessageSquare className="w-3.5 h-3.5" /></button>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* --- Send Message Modal --- */}
+      <Dialog open={!!messageCandidate} onOpenChange={(open) => !open && setMessageCandidate(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Message Applicant</DialogTitle>
+          </DialogHeader>
+          {messageCandidate && (
+            <div className="py-2">
+              <p className="text-sm text-muted-foreground mb-4">Send a direct message to <strong className="text-foreground">{messageCandidate.candidate}</strong>. They will be notified via email and the platform.</p>
+              <textarea 
+                className="w-full h-32 px-3 py-3 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" 
+                placeholder="Type your message here..."
+                defaultValue={`Hi ${messageCandidate.candidate.split(' ')[0]},\n\nWe have reviewed your application for the ${messageCandidate.role} position...`}
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMessageCandidate(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Message sent to ${messageCandidate.candidate}`); setMessageCandidate(null); }} className="gap-2">
+              <Send className="w-4 h-4" /> Send Message
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

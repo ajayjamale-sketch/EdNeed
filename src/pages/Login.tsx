@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { GraduationCap, Eye, EyeOff, ArrowRight, CheckCircle, BookOpen, Brain, Trophy, User, AlertCircle } from "lucide-react";
 import { useTheme } from "@/components/features/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
@@ -18,8 +18,14 @@ export default function Login() {
   const navigate = useNavigate();
   const { resolvedTheme, setTheme } = useTheme();
 
+  const location = useLocation();
+
   useEffect(() => {
     try {
+      // Don't auto-redirect if there's a specific redirect parameter, force them to login again or handle it explicitly
+      const params = new URLSearchParams(location.search);
+      if (params.get("redirect")) return;
+
       const stored = localStorage.getItem("edneed-user");
       if (stored) {
         const user = JSON.parse(stored);
@@ -40,7 +46,7 @@ export default function Login() {
     } catch (e) {
       console.error(e);
     }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -59,8 +65,18 @@ export default function Login() {
     setTimeout(() => {
       const user = { name: "Alex Johnson", email, role: "Student", id: "u1" };
       localStorage.setItem("edneed-user", JSON.stringify(user));
-      toast.success("Welcome back! Redirecting to dashboard...");
-      setTimeout(() => navigate("/dashboard"), 800);
+      
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get("redirect");
+      const selectedPlan = params.get("selectedPlan");
+      
+      if (redirect) {
+        toast.success("Welcome back! Continuing...");
+        setTimeout(() => navigate(`${redirect}${selectedPlan ? `?selectedPlan=${selectedPlan}` : ''}`), 800);
+      } else {
+        toast.success("Welcome back! Redirecting to dashboard...");
+        setTimeout(() => navigate("/dashboard"), 800);
+      }
     }, 1500);
   };
 

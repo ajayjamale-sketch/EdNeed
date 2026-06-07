@@ -3,6 +3,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search, CheckCircle, AlertCircle, ToggleRight, ToggleLeft, Eye, Trash2, Star, Users, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const courses = [
   { id: 1, title: "Complete JEE Physics", instructor: "Dr. Vivek Agarwal", category: "JEE Prep", students: 18500, rating: 4.9, revenue: 554850, status: "published" },
@@ -22,6 +24,7 @@ const statusCfg: Record<string, { label: string; color: string }> = {
 export default function AdminCourses() {
   const [data, setData] = useState(courses);
   const [search, setSearch] = useState("");
+  const [viewCourse, setViewCourse] = useState<any>(null);
 
   const filtered = data.filter((c) => c.title.toLowerCase().includes(search.toLowerCase()) || c.instructor.toLowerCase().includes(search.toLowerCase()));
 
@@ -96,7 +99,7 @@ export default function AdminCourses() {
                       {c.status === "published" ? <ToggleRight className="w-4 h-4 text-accent" /> : <ToggleLeft className="w-4 h-4 text-muted-foreground" />}
                     </button>
                   )}
-                  <button onClick={() => toast.success(`Reviewing: ${c.title}`)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setViewCourse(c)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-muted transition-colors"><Eye className="w-3.5 h-3.5" /></button>
                   <button onClick={() => remove(c.id)} className="w-8 h-8 border border-border rounded-lg flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
@@ -104,6 +107,55 @@ export default function AdminCourses() {
           );
         })}
       </div>
+
+      {/* --- View Course Details Modal --- */}
+      <Dialog open={!!viewCourse} onOpenChange={(open) => !open && setViewCourse(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Course Details</DialogTitle>
+          </DialogHeader>
+          {viewCourse && (
+            <div className="py-4 space-y-5">
+              <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl border border-border">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white flex-shrink-0">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{viewCourse.title}</h3>
+                  <div className="text-sm text-muted-foreground">Instructor: {viewCourse.instructor}</div>
+                  <div className="mt-2 flex gap-2">
+                    <span className="text-xs bg-muted border border-border px-2 py-0.5 rounded-full">{viewCourse.category}</span>
+                    <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full", statusCfg[viewCourse.status]?.color)}>
+                      {statusCfg[viewCourse.status]?.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl border border-border bg-card text-center">
+                  <div className="text-2xl font-bold text-primary">{viewCourse.students.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1"><Users className="w-3.5 h-3.5" /> Enrolled Students</div>
+                </div>
+                <div className="p-4 rounded-xl border border-border bg-card text-center">
+                  <div className="text-2xl font-bold text-accent">₹{viewCourse.revenue.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Total Revenue</div>
+                </div>
+                <div className="p-4 rounded-xl border border-border bg-card text-center col-span-2">
+                  <div className="text-2xl font-bold text-yellow-500 flex items-center justify-center gap-2">
+                    {viewCourse.rating > 0 ? viewCourse.rating : "N/A"}
+                    {viewCourse.rating > 0 && <Star className="w-5 h-5 fill-yellow-500" />}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Average Rating</div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setViewCourse(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

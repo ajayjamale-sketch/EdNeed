@@ -29,11 +29,26 @@ const statusColor: Record<string, string> = {
 
 export default function ParentAttendance() {
   const [child, setChild] = useState<"riya" | "aryan">("riya");
-  const [month, setMonth] = useState("June 2025");
+  const [monthIdx, setMonthIdx] = useState(5); // June
+  const months = ["January 2025", "February 2025", "March 2025", "April 2025", "May 2025", "June 2025", "July 2025"];
+  const month = months[monthIdx];
 
   const present = monthDays.filter((d) => d.status === "present").length;
   const absent = monthDays.filter((d) => d.status === "absent").length;
   const late = monthDays.filter((d) => d.status === "late").length;
+
+  const exportCSV = () => {
+    const csvData = [
+      ["Date", "Status"],
+      ...monthDays.map(d => [`${d.day} ${month.split(" ")[0]}`, d.status])
+    ].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Attendance_${month.replace(" ", "_")}.csv`;
+    link.click();
+    toast.success("Attendance report downloaded successfully!");
+  };
 
   return (
     <DashboardLayout title="Attendance Tracker" subtitle="Monitor daily and subject-wise attendance for your children">
@@ -70,10 +85,10 @@ export default function ParentAttendance() {
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-semibold">Monthly Attendance — {month}</h3>
             <div className="flex items-center gap-2">
-              <button onClick={() => toast.info("Previous month")} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
+              <button onClick={() => setMonthIdx(Math.max(0, monthIdx - 1))} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => toast.info("Next month")} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
+              <button onClick={() => setMonthIdx(Math.min(months.length - 1, monthIdx + 1))} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -89,7 +104,7 @@ export default function ParentAttendance() {
             {monthDays.map((d) => (
               <button
                 key={d.day}
-                onClick={() => d.status !== "upcoming" && toast.info(`${d.day} June: ${d.status}`)}
+                onClick={() => d.status !== "upcoming" && toast.info(`${d.day} ${month.split(" ")[0]}: ${d.status.toUpperCase()}`)}
                 className={cn("aspect-square rounded-lg flex items-center justify-center text-xs font-medium transition-all hover:ring-2 hover:ring-primary/30", d.status === "present" ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300" : d.status === "absent" ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300" : d.status === "late" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300" : "bg-muted text-muted-foreground")}
               >
                 {d.day}
@@ -130,7 +145,7 @@ export default function ParentAttendance() {
               <p className="text-xs text-foreground">Physics attendance is below 80%. Please ensure regular attendance to avoid debarment from exams.</p>
             </div>
           )}
-          <button onClick={() => toast.success("Downloading attendance report...")} className="w-full mt-4 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+          <button onClick={exportCSV} className="w-full mt-4 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
             Download Report
           </button>
         </div>

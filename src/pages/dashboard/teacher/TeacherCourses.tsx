@@ -3,6 +3,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { BookOpen, Plus, Edit, Trash2, Eye, Video, FileText, ToggleLeft, ToggleRight, Star, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const initialCourses = [
   { id: 1, title: "Advanced Calculus for JEE", category: "JEE Prep", lessons: 120, students: 1842, rating: 4.9, revenue: 92100, status: "published", completionRate: 68 },
@@ -16,6 +18,7 @@ export default function TeacherCourses() {
   const [showForm, setShowForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("JEE Prep");
+  const [editCourse, setEditCourse] = useState<any>(null);
 
   const toggleStatus = (id: number) => {
     setCourses((prev) => prev.map((c) => {
@@ -40,6 +43,12 @@ export default function TeacherCourses() {
     setNewTitle("");
     setShowForm(false);
     toast.success("New course created! Start adding lessons.");
+  };
+
+  const handleEditSave = () => {
+    setCourses(courses.map(c => c.id === editCourse.id ? editCourse : c));
+    toast.success("Course details updated!");
+    setEditCourse(null);
   };
 
   return (
@@ -113,7 +122,7 @@ export default function TeacherCourses() {
                 <button onClick={() => toggleStatus(c.id)} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors" title={c.status === "published" ? "Unpublish" : "Publish"}>
                   {c.status === "published" ? <ToggleRight className="w-4 h-4 text-accent" /> : <ToggleLeft className="w-4 h-4 text-muted-foreground" />}
                 </button>
-                <button onClick={() => toast.success(`Editing: ${c.title}`)} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                <button onClick={() => setEditCourse(c)} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
                   <Edit className="w-3.5 h-3.5" />
                 </button>
                 <button onClick={() => toast.success(`Previewing: ${c.title}`)} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
@@ -127,6 +136,40 @@ export default function TeacherCourses() {
           </div>
         ))}
       </div>
+
+      <Dialog open={!!editCourse} onOpenChange={(open) => !open && setEditCourse(null)}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Edit Course Details</DialogTitle>
+          </DialogHeader>
+          {editCourse && (
+            <div className="py-4 space-y-4">
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Course Title</label>
+                <input 
+                  value={editCourse.title} 
+                  onChange={(e) => setEditCourse({ ...editCourse, title: e.target.value })} 
+                  className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5">Category</label>
+                <select 
+                  value={editCourse.category} 
+                  onChange={(e) => setEditCourse({ ...editCourse, category: e.target.value })} 
+                  className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background"
+                >
+                  {["JEE Prep", "NEET Prep", "Mathematics", "Physics", "Chemistry", "Biology", "UPSC", "CAT Prep", "Coding", "Language"].map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditCourse(null)}>Cancel</Button>
+            <Button onClick={handleEditSave}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

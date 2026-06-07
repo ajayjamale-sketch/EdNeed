@@ -3,14 +3,16 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { DollarSign, CheckCircle, Clock, AlertCircle, CreditCard, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-const fees = [
-  { term: "Annual Fee 2025–26", due: "Apr 30, 2025", amount: 45000, paid: 45000, status: "paid", date: "Apr 2, 2025", child: "Riya" },
-  { term: "Transport Fee — Q1", due: "Apr 15, 2025", amount: 6000, paid: 6000, status: "paid", date: "Apr 5, 2025", child: "Riya" },
-  { term: "Annual Fee 2025–26", due: "Apr 30, 2025", amount: 38000, paid: 38000, status: "paid", date: "Apr 10, 2025", child: "Aryan" },
-  { term: "Activity Fee — Q2", due: "Jul 15, 2025", amount: 3500, paid: 0, status: "upcoming", date: "", child: "Riya" },
-  { term: "Transport Fee — Q2", due: "Jul 15, 2025", amount: 6000, paid: 0, status: "upcoming", date: "", child: "Aryan" },
-  { term: "Lab Fee — Science", due: "Jun 20, 2025", amount: 2500, paid: 0, status: "overdue", date: "", child: "Aryan" },
+const initialFees = [
+  { id: 1, term: "Annual Fee 2025–26", due: "Apr 30, 2025", amount: 45000, paid: 45000, status: "paid", date: "Apr 2, 2025", child: "Riya" },
+  { id: 2, term: "Transport Fee — Q1", due: "Apr 15, 2025", amount: 6000, paid: 6000, status: "paid", date: "Apr 5, 2025", child: "Riya" },
+  { id: 3, term: "Annual Fee 2025–26", due: "Apr 30, 2025", amount: 38000, paid: 38000, status: "paid", date: "Apr 10, 2025", child: "Aryan" },
+  { id: 4, term: "Activity Fee — Q2", due: "Jul 15, 2025", amount: 3500, paid: 0, status: "upcoming", date: "", child: "Riya" },
+  { id: 5, term: "Transport Fee — Q2", due: "Jul 15, 2025", amount: 6000, paid: 0, status: "upcoming", date: "", child: "Aryan" },
+  { id: 6, term: "Lab Fee — Science", due: "Jun 20, 2025", amount: 2500, paid: 0, status: "overdue", date: "", child: "Aryan" },
 ];
 
 const statusCfg: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -21,9 +23,41 @@ const statusCfg: Record<string, { label: string; color: string; icon: React.Elem
 
 export default function ParentFees() {
   const [child, setChild] = useState("all");
-  const filtered = fees.filter((f) => child === "all" || f.child === child);
+  const [feesList, setFeesList] = useState(initialFees);
+  const [payModalOpen, setPayModalOpen] = useState<any>(null);
+
+  const filtered = feesList.filter((f) => child === "all" || f.child === child);
   const totalDue = filtered.filter((f) => f.status !== "paid").reduce((a, f) => a + f.amount, 0);
   const totalPaid = filtered.filter((f) => f.status === "paid").reduce((a, f) => a + f.paid, 0);
+
+  const handlePay = () => {
+    if (!payModalOpen) return;
+    setFeesList(prev => prev.map(f => {
+      if (f.id === payModalOpen.id) {
+        return { ...f, status: "paid", paid: f.amount, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) };
+      }
+      return f;
+    }));
+    toast.success(`Payment of ₹${payModalOpen.amount.toLocaleString()} successful!`);
+    setPayModalOpen(null);
+  };
+
+  const downloadReceipt = (fee: any) => {
+    const csvData = [
+      ["Receipt Number", `REC-${Math.floor(Math.random() * 100000)}`],
+      ["Date", fee.date || new Date().toLocaleDateString()],
+      ["Student", fee.child],
+      ["Fee Type", fee.term],
+      ["Amount Paid", `Rs. ${fee.amount}`],
+      ["Status", "PAID"]
+    ].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Receipt_${fee.term.replace(/ /g, "_")}.csv`;
+    link.click();
+    toast.success("Receipt downloaded successfully!");
+  };
 
   return (
     <DashboardLayout title="Fee Management" subtitle="Track and pay school fees for your children">
@@ -73,16 +107,16 @@ export default function ParentFees() {
               </div>
               {f.status !== "paid" && (
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => toast.success(`Processing payment of ₹${f.amount.toLocaleString()} for ${f.term}...`)} className="flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                  <button onClick={() => setPayModalOpen(f)} className="flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
                     <CreditCard className="w-3.5 h-3.5" /> Pay Now
                   </button>
-                  <button onClick={() => toast.success("Downloading fee receipt...")} className="flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
-                    <Download className="w-3.5 h-3.5" /> Receipt
+                  <button onClick={() => downloadReceipt(f)} className="flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+                    <Download className="w-3.5 h-3.5" /> Invoice
                   </button>
                 </div>
               )}
               {f.status === "paid" && (
-                <button onClick={() => toast.success("Downloading receipt...")} className="mt-3 flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+                <button onClick={() => downloadReceipt(f)} className="mt-3 flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
                   <Download className="w-3.5 h-3.5" /> Download Receipt
                 </button>
               )}
@@ -90,6 +124,34 @@ export default function ParentFees() {
           );
         })}
       </div>
+
+      <Dialog open={!!payModalOpen} onOpenChange={(open) => !open && setPayModalOpen(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Complete Payment</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <div className="w-16 h-16 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-2xl mb-1 text-foreground">₹{payModalOpen?.amount.toLocaleString()}</h3>
+            <p className="text-sm font-semibold mb-1 text-foreground">{payModalOpen?.term}</p>
+            <p className="text-xs text-muted-foreground mb-4">Student: {payModalOpen?.child}</p>
+            
+            <div className="text-left bg-muted p-4 rounded-xl mb-4">
+              <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">₹{payModalOpen?.amount.toLocaleString()}</span></div>
+              <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Convenience Fee</span><span className="font-medium">₹0</span></div>
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2"><span>Total</span><span>₹{payModalOpen?.amount.toLocaleString()}</span></div>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setPayModalOpen(null)}>Cancel</Button>
+            <Button onClick={handlePay} className="bg-primary hover:bg-primary/90 text-white gap-2">
+              Pay ₹{payModalOpen?.amount.toLocaleString()}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

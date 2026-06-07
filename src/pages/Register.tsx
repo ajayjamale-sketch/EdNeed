@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { GraduationCap, Eye, EyeOff, ArrowRight, Check, BookOpen, Users, School } from "lucide-react";
 import { useTheme } from "@/components/features/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
@@ -28,8 +28,13 @@ export default function Register() {
   const navigate = useNavigate();
   const { resolvedTheme, setTheme } = useTheme();
 
+  const location = useLocation();
+
   useEffect(() => {
     try {
+      // Don't auto-redirect if there's a specific redirect parameter
+      const params = new URLSearchParams(location.search);
+      if (params.get("redirect")) return;
       const stored = localStorage.getItem("edneed-user");
       if (stored) {
         const user = JSON.parse(stored);
@@ -50,7 +55,7 @@ export default function Register() {
     } catch (e) {
       console.error(e);
     }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const update = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -84,19 +89,27 @@ export default function Register() {
     setTimeout(() => {
       const user = { name: form.name, email: form.email, role: role.toLowerCase(), id: Date.now().toString() };
       localStorage.setItem("edneed-user", JSON.stringify(user));
-      toast.success("Account created! Welcome to EdNeed");
       
-      const paths: Record<string, string> = {
-        student: "/dashboard",
-        parent: "/dashboard/parent",
-        teacher: "/dashboard/teacher",
-        institution: "/dashboard/institution",
-        counselor: "/dashboard/counselor",
-        recruiter: "/dashboard/recruiter",
-        admin: "/dashboard/admin",
-      };
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get("redirect");
+      const selectedPlan = params.get("selectedPlan");
       
-      setTimeout(() => navigate(paths[role.toLowerCase()] || "/dashboard"), 1000);
+      if (redirect) {
+        toast.success("Account created! Continuing to your selection...");
+        setTimeout(() => navigate(`${redirect}${selectedPlan ? `?selectedPlan=${selectedPlan}` : ''}`), 1000);
+      } else {
+        toast.success("Account created! Welcome to EdNeed");
+        const paths: Record<string, string> = {
+          student: "/dashboard",
+          parent: "/dashboard/parent",
+          teacher: "/dashboard/teacher",
+          institution: "/dashboard/institution",
+          counselor: "/dashboard/counselor",
+          recruiter: "/dashboard/recruiter",
+          admin: "/dashboard/admin",
+        };
+        setTimeout(() => navigate(paths[role.toLowerCase()] || "/dashboard"), 1000);
+      }
     }, 1800);
   };
 

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Users, BookOpen, DollarSign, Calendar, TrendingUp, AlertCircle, BarChart2, Building, MessageSquare, ChevronRight } from "lucide-react";
+import { Users, BookOpen, DollarSign, Calendar, TrendingUp, AlertCircle, BarChart2, Building, MessageSquare, ChevronRight, Download, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const attendanceData = [
@@ -30,6 +32,26 @@ const recentAlerts = [
 ];
 
 export default function InstitutionDashboard() {
+  const [alerts, setAlerts] = useState(recentAlerts);
+  const [selectedAlert, setSelectedAlert] = useState<any>(null);
+
+  const handleExport = () => {
+    const headers = ["Metric,Value"];
+    const csvData = [
+      "Total Students,1000",
+      "Teaching Staff,68",
+      "Fee Collection,82%",
+      "Avg. Attendance,91%"
+    ];
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "institution_overview.csv";
+    a.click();
+    toast.success("Exported institution overview report");
+  };
+
   return (
     <DashboardLayout title="Institution Dashboard" subtitle="Manage your school's academic operations, students, and staff">
       {/* KPIs */}
@@ -119,10 +141,15 @@ export default function InstitutionDashboard() {
         <div className="bg-card border border-border rounded-2xl p-5">
           <h3 className="font-semibold mb-4">Important Alerts</h3>
           <div className="space-y-3">
-            {recentAlerts.map((a, i) => (
-              <div key={i} className={cn("flex items-start gap-3 p-3 rounded-xl cursor-pointer hover:opacity-80 transition-opacity", a.color)} onClick={() => toast.info(a.msg)}>
+            {alerts.length === 0 ? (
+              <div className="text-center p-4 text-xs text-muted-foreground border border-dashed border-border rounded-xl">All caught up! No new alerts.</div>
+            ) : alerts.map((a, i) => (
+              <div key={i} className={cn("flex items-start gap-3 p-3 rounded-xl transition-opacity relative group cursor-pointer", a.color)} onClick={() => setSelectedAlert(a)}>
                 <a.icon className={cn("w-4 h-4 flex-shrink-0 mt-0.5", a.color.split(" ")[0])} />
-                <p className="text-xs leading-relaxed">{a.msg}</p>
+                <p className="text-xs leading-relaxed flex-1">{a.msg}</p>
+                <button onClick={(e) => { e.stopPropagation(); setAlerts(alerts.filter((_, idx) => idx !== i)); toast.success("Alert dismissed"); }} className="opacity-0 group-hover:opacity-100 p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded">
+                  <X className="w-3 h-3" />
+                </button>
               </div>
             ))}
           </div>
@@ -130,12 +157,37 @@ export default function InstitutionDashboard() {
             <Link to="/dashboard/institution/communication" className="py-2 text-center border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
               <MessageSquare className="w-3.5 h-3.5 inline mr-1" /> Parent Comms
             </Link>
-            <button onClick={() => toast.success("Generating institution report...")} className="py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
-              Generate Report
+            <button onClick={handleExport} className="py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-1">
+              <Download className="w-3.5 h-3.5" /> Generate Report
             </button>
           </div>
         </div>
       </div>
+
+      {/* --- Alert Details Modal --- */}
+      <Dialog open={!!selectedAlert} onOpenChange={(open) => !open && setSelectedAlert(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedAlert && <selectedAlert.icon className={cn("w-5 h-5", selectedAlert.color.split(" ")[0])} />}
+              Alert Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedAlert && (
+            <div className="py-4">
+              <div className={cn("p-4 rounded-xl border", selectedAlert.color)}>
+                <p className="text-sm font-medium">{selectedAlert.msg}</p>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4 leading-relaxed">
+                This requires your attention. Please navigate to the appropriate module (Attendance, Fees, or Staff) to resolve this notice.
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setSelectedAlert(null)}>Acknowledge</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

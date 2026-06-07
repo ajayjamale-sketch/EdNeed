@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Megaphone, MessageSquare, PlusCircle } from "lucide-react";
 
 const earningsData = [
   { month: "Jan", amount: 12000 }, { month: "Feb", amount: 15000 },
@@ -34,8 +37,24 @@ const colorMap: Record<string, string> = {
 };
 
 export default function TeacherDashboard() {
+  const [announceOpen, setAnnounceOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+
   return (
     <DashboardLayout title="Teacher Dashboard" subtitle="Manage your courses, students, and track earnings">
+      
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button onClick={() => setAnnounceOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-sm font-semibold hover:border-primary/50 transition-colors">
+          <Megaphone className="w-4 h-4 text-primary" /> Send Announcement
+        </button>
+        <button onClick={() => setNoteOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-sm font-semibold hover:border-primary/50 transition-colors">
+          <MessageSquare className="w-4 h-4 text-purple-500" /> Add Quick Note
+        </button>
+        <button onClick={() => toast.success("Opening live class environment...")} className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-sm font-semibold hover:border-primary/50 transition-colors">
+          <Play className="w-4 h-4 text-green-500" /> Start Live Class
+        </button>
+      </div>
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
@@ -134,6 +153,47 @@ export default function TeacherDashboard() {
           ))}
         </div>
       </div>
+      {/* Modals */}
+      <Dialog open={announceOpen} onOpenChange={setAnnounceOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Send Announcement</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Select Course</label>
+              <select className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background">
+                {myCourses.filter(c => c.status === "published").map(c => <option key={c.title}>{c.title}</option>)}
+                <option>All My Students</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1.5">Message</label>
+              <textarea placeholder="Type your announcement here..." className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background min-h-[100px]"></textarea>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAnnounceOpen(false)}>Cancel</Button>
+            <Button onClick={() => { toast.success("Announcement broadcasted successfully!"); setAnnounceOpen(false); }}>Broadcast</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Add Quick Note</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <textarea placeholder="Jot down a quick thought, task, or reminder..." className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background min-h-[120px]"></textarea>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNoteOpen(false)}>Cancel</Button>
+            <Button onClick={() => { toast.success("Note saved to your personal dashboard!"); setNoteOpen(false); }}>Save Note</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </DashboardLayout>
   );
 }

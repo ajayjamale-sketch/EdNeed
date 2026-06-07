@@ -10,6 +10,10 @@ import {
 import heroImg from "@/assets/hero-illustration.png";
 import { cn } from "@/lib/utils";
 import DemoModal from "@/components/features/DemoModal";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // ─── Hero Section ────────────────────────────────────────────────
 function HeroSection() {
@@ -338,31 +342,31 @@ function BenefitsSection() {
 // ─── Dashboard Preview Section ─────────────────────────────────────
 function DashboardPreviewSection() {
   return (
-    <section className="section-padding bg-gradient-to-br from-slate-900 to-blue-950 dark:from-slate-950 dark:to-blue-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.15),_transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.12),_transparent_60%)]" />
+    <section className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.06),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.15),_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.05),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.12),_transparent_60%)]" />
 
       <div className="container-custom relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full text-sm font-semibold mb-4 border border-white/20">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary dark:bg-white/10 dark:text-white rounded-full text-sm font-semibold mb-4 border border-primary/20 dark:border-white/20">
             <BarChart3 className="w-3.5 h-3.5" />
             Live Analytics Dashboard
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Track Every Step of Your <span className="text-blue-300">Learning Journey</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Track Every Step of Your <span className="gradient-text">Learning Journey</span>
           </h2>
-          <p className="text-blue-100/70 text-lg">
+          <p className="text-muted-foreground text-lg">
             Comprehensive analytics and insights help you understand exactly where you stand and what to do next.
           </p>
         </div>
 
         {/* Mock Dashboard UI */}
-        <div className="bg-slate-900/80 border border-slate-700/50 rounded-2xl p-5 backdrop-blur-sm shadow-2xl">
+        <div className="bg-card border border-border rounded-2xl p-5 backdrop-blur-sm shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-5 pb-4 border-b border-slate-700/50">
+          <div className="flex items-center justify-between mb-5 pb-4 border-b border-border">
             <div>
-              <h3 className="text-white font-semibold">Student Dashboard</h3>
-              <p className="text-slate-400 text-xs mt-0.5">Welcome back, Alex! 3 tasks pending</p>
+              <h3 className="text-foreground font-semibold">Student Dashboard</h3>
+              <p className="text-muted-foreground text-xs mt-0.5">Welcome back, Alex! 3 tasks pending</p>
             </div>
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500" />
@@ -379,38 +383,38 @@ function DashboardPreviewSection() {
               { label: "Tests Taken", val: "34", change: "+5", color: "green" },
               { label: "Avg. Score", val: "82%", change: "+4%", color: "orange" },
             ].map((s, i) => (
-              <div key={i} className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/30">
-                <div className="text-slate-400 text-xs mb-1">{s.label}</div>
-                <div className="text-white text-2xl font-bold">{s.val}</div>
-                <div className="text-emerald-400 text-xs mt-1 font-medium">{s.change} this week</div>
+              <div key={i} className="bg-muted/50 rounded-xl p-4 border border-border">
+                <div className="text-muted-foreground text-xs mb-1">{s.label}</div>
+                <div className="text-foreground text-2xl font-bold">{s.val}</div>
+                <div className="text-emerald-500 dark:text-emerald-400 text-xs mt-1 font-medium">{s.change} this week</div>
               </div>
             ))}
           </div>
 
           {/* Progress bars */}
           <div className="grid md:grid-cols-2 gap-5">
-            <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/30">
-              <h4 className="text-white text-sm font-semibold mb-4">Subject Progress</h4>
+            <div className="bg-muted/50 rounded-xl p-4 border border-border">
+              <h4 className="text-foreground text-sm font-semibold mb-4">Subject Progress</h4>
               {[
-                { sub: "Mathematics", pct: 78, color: "bg-blue-500" },
+                { sub: "Mathematics", pct: 78, color: "bg-primary" },
                 { sub: "Physics", pct: 64, color: "bg-purple-500" },
                 { sub: "Chemistry", pct: 89, color: "bg-emerald-500" },
                 { sub: "English", pct: 71, color: "bg-orange-500" },
               ].map((s) => (
                 <div key={s.sub} className="mb-3 last:mb-0">
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span className="text-slate-300">{s.sub}</span>
-                    <span className="text-slate-400">{s.pct}%</span>
+                    <span className="text-foreground">{s.sub}</span>
+                    <span className="text-muted-foreground">{s.pct}%</span>
                   </div>
-                  <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div className={cn("h-full rounded-full transition-all", s.color)} style={{ width: `${s.pct}%` }} />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/30">
-              <h4 className="text-white text-sm font-semibold mb-4">Upcoming Schedule</h4>
+            <div className="bg-muted/50 rounded-xl p-4 border border-border">
+              <h4 className="text-foreground text-sm font-semibold mb-4">Upcoming Schedule</h4>
               {[
                 { title: "Calculus — Live Class", time: "Today, 4:00 PM", status: "Soon" },
                 { title: "Physics Mock Test", time: "Tomorrow, 10:00 AM", status: "Scheduled" },
@@ -419,13 +423,13 @@ function DashboardPreviewSection() {
               ].map((e, i) => (
                 <div key={i} className="flex items-center justify-between mb-3 last:mb-0">
                   <div>
-                    <div className="text-slate-200 text-xs font-medium">{e.title}</div>
-                    <div className="text-slate-500 text-xs mt-0.5">{e.time}</div>
+                    <div className="text-foreground text-xs font-medium">{e.title}</div>
+                    <div className="text-muted-foreground text-xs mt-0.5">{e.time}</div>
                   </div>
                   <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", {
-                    "bg-blue-500/20 text-blue-400": e.status === "Soon",
-                    "bg-purple-500/20 text-purple-400": e.status === "Scheduled",
-                    "bg-orange-500/20 text-orange-400": e.status === "Due",
+                    "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400": e.status === "Soon",
+                    "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400": e.status === "Scheduled",
+                    "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400": e.status === "Due",
                   })}>
                     {e.status}
                   </span>
@@ -438,7 +442,7 @@ function DashboardPreviewSection() {
         <div className="text-center mt-8">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-slate-900 rounded-xl font-semibold hover:bg-white/90 transition-colors shadow-xl"
+            className="inline-flex items-center gap-2 px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
           >
             Explore Dashboard <ArrowRight className="w-4 h-4" />
           </Link>
@@ -610,6 +614,34 @@ const plans = [
 
 function PricingSection() {
   const [annual, setAnnual] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+
+  // Read real auth state from localStorage (same pattern as rest of the app)
+  const isLoggedIn = (() => {
+    try {
+      const stored = localStorage.getItem("edneed-user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        return !!(user && user.role);
+      }
+    } catch { /* ignore */ }
+    return false;
+  })();
+
+  const handlePlanSelect = (plan: any) => {
+    if (plan.name === "Institution") {
+      navigate("/contact");
+      return;
+    }
+    if (!isLoggedIn) {
+      toast.error("Please sign in to subscribe to a plan");
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}&selectedPlan=${plan.name.toLowerCase()}`);
+      return;
+    }
+    setSelectedPlan(plan);
+  };
 
   return (
     <section id="pricing" className="section-padding bg-gradient-to-b from-slate-50/50 to-background dark:from-slate-950/50">
@@ -619,7 +651,7 @@ function PricingSection() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Plans for Every <span className="gradient-text">Learner</span>
           </h2>
-          <p className="text-muted-foreground text-lg">Start free, scale as you grow. No hidden fees.</p>
+          <p className="text-muted-foreground text-lg mb-8">Start free, scale as you grow. No hidden fees.</p>
 
           {/* Toggle */}
           <div className="flex items-center justify-center gap-3 mt-6">
@@ -672,8 +704,8 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <Link
-                to={plan.name === "Institution" ? "/contact" : "/register"}
+              <button
+                onClick={() => handlePlanSelect(plan)}
                 className={cn(
                   "block w-full py-3 rounded-xl text-center text-sm font-semibold transition-all",
                   plan.popular
@@ -682,7 +714,7 @@ function PricingSection() {
                 )}
               >
                 {plan.cta}
-              </Link>
+              </button>
             </div>
           ))}
         </div>
@@ -691,6 +723,61 @@ function PricingSection() {
           All plans include a 14-day free trial. No credit card required.
         </p>
       </div>
+
+      {/* Payment Modal */}
+      <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Complete Subscription</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-2xl mb-1 text-foreground">
+              ₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}
+              <span className="text-sm font-medium text-muted-foreground">/{annual ? 'year' : 'month'}</span>
+            </h3>
+            <p className="text-sm font-semibold mb-1 text-foreground">{selectedPlan?.name} Plan</p>
+            <p className="text-xs text-muted-foreground mb-4">{annual ? "Billed annually" : "Billed monthly"}</p>
+
+            <div className="text-left bg-muted p-4 rounded-xl mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Plan Cost</span>
+                <span className="font-medium">₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}</span>
+              </div>
+              {annual && selectedPlan && selectedPlan.price.monthly > 0 && (
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Annual Discount</span>
+                  <span className="font-medium text-green-600">-20%</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2">
+                <span>Total Today</span>
+                <span>₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-left mb-2">Select Payment Method</p>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer bg-primary/5 border-primary/30">
+                <div className="w-4 h-4 rounded-full border-[5px] border-primary flex-shrink-0" />
+                <span className="text-sm font-semibold">Credit/Debit Card</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50">
+                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" />
+                <span className="text-sm font-medium text-muted-foreground">UPI / Google Pay</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setSelectedPlan(null)}>Cancel</Button>
+            <Button onClick={() => { toast.success(`Successfully subscribed to ${selectedPlan.name} plan!`); setSelectedPlan(null); }} className="bg-primary hover:bg-primary/90 text-white w-full">
+              Subscribe Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
