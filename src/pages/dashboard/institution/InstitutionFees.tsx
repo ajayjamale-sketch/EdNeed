@@ -4,6 +4,10 @@ import { DollarSign, CheckCircle, Clock, AlertCircle, CreditCard, Download, Sear
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const feeRecords = [
   { id: 1, student: "Aarav Sharma", class: "10-A", term: "Annual Fee 2025-26", amount: 45000, paid: 45000, due: "Apr 30", status: "paid", date: "Apr 2" },
@@ -14,12 +18,7 @@ const feeRecords = [
   { id: 6, student: "Ananya Singh", class: "8-C", term: "Annual Fee 2025-26", amount: 38000, paid: 38000, due: "Apr 30", status: "paid", date: "Apr 10" },
 ];
 
-const pieData = [
-  { name: "Fully Paid", value: 3, color: "#10B981" },
-  { name: "Partial", value: 1, color: "#2563EB" },
-  { name: "Overdue", value: 1, color: "#EF4444" },
-  { name: "Upcoming", value: 1, color: "#F59E0B" },
-];
+// Removed static pieData, will calculate dynamically
 
 const statusCfg: Record<string, { label: string; color: string }> = {
   paid: { label: "Paid", color: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300" },
@@ -29,17 +28,65 @@ const statusCfg: Record<string, { label: string; color: string }> = {
 };
 
 export default function InstitutionFees() {
+  const [data, setData] = useState(feeRecords);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  
+  const [isRecordOpen, setIsRecordOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
-  const filtered = feeRecords.filter((f) => {
+  const filtered = data.filter((f) => {
     const m = f.student.toLowerCase().includes(search.toLowerCase());
     const s = filter === "all" || f.status === filter;
     return m && s;
   });
 
-  const totalCollected = feeRecords.reduce((a, f) => a + f.paid, 0);
-  const totalDue = feeRecords.reduce((a, f) => a + (f.amount - f.paid), 0);
+  const totalCollected = data.reduce((a, f) => a + f.paid, 0);
+  const totalAmount = data.reduce((a, f) => a + f.amount, 0);
+  const totalDue = data.reduce((a, f) => a + Math.max(0, f.amount - f.paid), 0);
+  const collectionRate = totalAmount > 0 ? Math.round((totalCollected / totalAmount) * 100) : 0;
+
+  const pieData = [
+    { name: "Fully Paid", value: data.filter(f => f.status === "paid").length, color: "#10B981" },
+    { name: "Partial", value: data.filter(f => f.status === "partial").length, color: "#2563EB" },
+    { name: "Overdue", value: data.filter(f => f.status === "overdue").length, color: "#EF4444" },
+    { name: "Upcoming", value: data.filter(f => f.status === "upcoming").length, color: "#F59E0B" },
+  ].filter(p => p.value > 0);
+
+  const handleRecordPayment = (f: any) => {
+    setSelectedRecord(f);
+    setPaymentAmount(f.amount - f.paid);
+    setIsRecordOpen(true);
+  };
+
+  const handleSavePayment = () => {
+    if (!selectedRecord) return;
+    setData(prev => prev.map(f => {
+      if (f.id === selectedRecord.id) {
+        const newPaid = f.paid + paymentAmount;
+        let newStatus = f.status;
+        if (newPaid >= f.amount) newStatus = "paid";
+        else if (newPaid > 0 && f.status !== "overdue") newStatus = "partial";
+        return { ...f, paid: Math.min(newPaid, f.amount), status: newStatus };
+      }
+      return f;
+    }));
+    toast.success(`Payment of ₹${paymentAmount.toLocaleString()} recorded for ${selectedRecord.student}`);
+    setIsRecordOpen(false);
+  };
+
+  const handleExport = () => {
+    const headers = ["Student,Class,Term,Amount,Paid,Due Date,Status"];
+    const csvData = data.map(f => `${f.student},${f.class},${f.term},${f.amount},${f.paid},${f.due},${f.status}`);
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fee_report.csv";
+    a.click();
+    toast.success("Exported fee report");
+  };
 
   return (
     <DashboardLayout title="Fee Management" subtitle="Track fee collection, send reminders, and manage payments">
@@ -47,8 +94,8 @@ export default function InstitutionFees() {
         {[
           { label: "Total Collected", val: `₹${(totalCollected / 100000).toFixed(1)}L`, color: "text-accent" },
           { label: "Outstanding", val: `₹${(totalDue / 100000).toFixed(1)}L`, color: "text-destructive" },
-          { label: "Collection Rate", val: "82%", color: "text-primary" },
-          { label: "Overdue Students", val: feeRecords.filter((f) => f.status === "overdue").length.toString(), color: "text-orange-500" },
+          { label: "Collection Rate", val: `${collectionRate}%`, color: "text-primary" },
+          { label: "Overdue Students", val: data.filter((f) => f.status === "overdue").length.toString(), color: "text-orange-500" },
         ].map((s, i) => (
           <div key={i} className="bg-card border border-border rounded-2xl p-4">
             <div className={cn("text-2xl font-bold mb-1", s.color)}>{s.val}</div>
@@ -96,7 +143,7 @@ export default function InstitutionFees() {
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
                       {f.status !== "paid" && (
-                        <button onClick={() => toast.success(`Recording payment for ${f.student}...`)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">Record</button>
+                        <button onClick={() => handleRecordPayment(f)} className="px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">Record</button>
                       )}
                       <button onClick={() => toast.success(`Reminder sent to ${f.student}'s parents!`)} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors">
                         <Send className="w-3 h-3" />
@@ -124,12 +171,50 @@ export default function InstitutionFees() {
             <button onClick={() => toast.success("Sending payment reminders to all overdue parents...")} className="w-full py-2 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">
               Send Bulk Reminders
             </button>
-            <button onClick={() => toast.success("Downloading fee report...")} className="w-full py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors flex items-center justify-center gap-2">
+            <button onClick={handleExport} className="w-full py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors flex items-center justify-center gap-2">
               <Download className="w-3.5 h-3.5" /> Export Report
             </button>
           </div>
         </div>
       </div>
+
+      {/* --- Record Payment Modal --- */}
+      <Dialog open={isRecordOpen} onOpenChange={setIsRecordOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Record Payment</DialogTitle>
+          </DialogHeader>
+          {selectedRecord && (
+            <div className="grid gap-4 py-4">
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-semibold">{selectedRecord.student}</p>
+                  <p className="text-xs text-muted-foreground">{selectedRecord.term}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Total Due</p>
+                  <p className="font-bold text-destructive">₹{(selectedRecord.amount - selectedRecord.paid).toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="payment-amount">Payment Amount (₹)</Label>
+                <Input 
+                  id="payment-amount" 
+                  type="number" 
+                  min="1" 
+                  max={selectedRecord.amount - selectedRecord.paid} 
+                  value={paymentAmount} 
+                  onChange={(e) => setPaymentAmount(Number(e.target.value))} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRecordOpen(false)}>Cancel</Button>
+            <Button onClick={handleSavePayment}>Save Payment</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

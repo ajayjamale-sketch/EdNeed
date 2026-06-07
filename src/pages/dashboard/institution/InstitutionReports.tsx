@@ -1,7 +1,10 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Download, TrendingUp, BarChart2, Users, Star, Award } from "lucide-react";
+import { Download, TrendingUp, BarChart2, Users, Star, Award, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line } from "recharts";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const examResults = [
   { class: "Class 8", avg: 72, pass: 95, distinction: 28 },
@@ -26,6 +29,26 @@ const topStudents = [
 ];
 
 export default function InstitutionReports() {
+  const [isClassReportOpen, setIsClassReportOpen] = useState(false);
+  const [selectedClassReport, setSelectedClassReport] = useState<any>(null);
+
+  const handleOpenClassReport = (e: any) => {
+    setSelectedClassReport(e);
+    setIsClassReportOpen(true);
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Class,Average Score (%),Pass Rate (%),Distinction Count"];
+    const csvData = examResults.map(e => `${e.class},${e.avg},${e.pass},${e.distinction}`);
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "academic_report.csv";
+    a.click();
+    toast.success("Exported academic report successfully");
+  };
+
   return (
     <DashboardLayout title="Academic Reports" subtitle="Comprehensive performance reports across all classes and subjects">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -76,7 +99,7 @@ export default function InstitutionReports() {
           <h3 className="font-semibold mb-4">Class Performance Summary</h3>
           <div className="space-y-3">
             {examResults.map((e, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 rounded-xl border border-border hover:bg-muted/30 cursor-pointer transition-colors" onClick={() => toast.success(`Opening ${e.class} detailed report...`)}>
+              <div key={i} className="flex items-center gap-4 p-3 rounded-xl border border-border hover:bg-muted/30 cursor-pointer transition-colors" onClick={() => handleOpenClassReport(e)}>
                 <div className="w-16 text-sm font-semibold">{e.class}</div>
                 <div className="flex-1">
                   <div className="flex gap-4 text-xs text-muted-foreground">
@@ -112,13 +135,66 @@ export default function InstitutionReports() {
             ))}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => toast.success("Generating full academic report...")} className="flex-1 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90">Generate Report</button>
-            <button onClick={() => toast.success("Downloading PDF...")} className="flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
-              <Download className="w-3.5 h-3.5" /> PDF
+            <button onClick={handleExportCSV} className="flex-1 py-2.5 gradient-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 flex items-center justify-center gap-2">
+              <FileText className="w-3.5 h-3.5" /> Generate CSV Report
+            </button>
+            <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+              <Download className="w-3.5 h-3.5" /> Export
             </button>
           </div>
         </div>
       </div>
+
+      {/* --- Class Detailed Report Modal --- */}
+      <Dialog open={isClassReportOpen} onOpenChange={setIsClassReportOpen}>
+        <DialogContent className="sm:max-w-[450px] bg-background">
+          <DialogHeader>
+            <DialogTitle>{selectedClassReport?.class} — Detailed Report</DialogTitle>
+          </DialogHeader>
+          {selectedClassReport && (
+            <div className="py-4 space-y-5">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 bg-muted/30 rounded-xl border border-border text-center">
+                  <div className="text-2xl font-bold text-primary">{selectedClassReport.avg}%</div>
+                  <div className="text-xs text-muted-foreground mt-1">Class Average</div>
+                </div>
+                <div className="p-4 bg-muted/30 rounded-xl border border-border text-center">
+                  <div className="text-2xl font-bold text-accent">{selectedClassReport.pass}%</div>
+                  <div className="text-xs text-muted-foreground mt-1">Pass Rate</div>
+                </div>
+                <div className="p-4 bg-muted/30 rounded-xl border border-border text-center">
+                  <div className="text-2xl font-bold text-yellow-500">{selectedClassReport.distinction}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Distinctions</div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Subject Performance Breakdown</h4>
+                <div className="space-y-3">
+                  {[
+                    { subject: "Mathematics", avg: selectedClassReport.avg + 4 },
+                    { subject: "Science", avg: selectedClassReport.avg - 2 },
+                    { subject: "English", avg: selectedClassReport.avg + 1 },
+                  ].map((sub, idx) => (
+                    <div key={idx}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium">{sub.subject}</span>
+                        <span className="text-muted-foreground">{sub.avg}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-primary rounded-full" style={{ width: `${sub.avg}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsClassReportOpen(false)}>Close Report</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Plus, Send, Bell } from "lucide-react";
+import { Search, Plus, Send, Bell, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const parents = [
   { id: 1, name: "Rakesh Sharma", student: "Aarav Sharma", class: "10-A", phone: "+91-9876543210", initials: "RS", color: "bg-blue-500", unread: 2 },
@@ -10,11 +12,11 @@ const parents = [
   { id: 3, name: "Vijay Verma", student: "Rohan Verma", class: "9-A", phone: "+91-9876543212", initials: "VV", color: "bg-red-500", unread: 1 },
 ];
 
-const notices = [
-  { title: "Annual Sports Day — June 15", sent: "Jun 1", recipients: "All Parents", read: 820 },
-  { title: "Parent-Teacher Meeting — June 12", sent: "May 28", recipients: "Class 10 Parents", read: 240 },
-  { title: "Fee Payment Reminder — Q2", sent: "May 25", recipients: "Pending Fee Parents", read: 95 },
-  { title: "Summer Vacation Notice", sent: "May 20", recipients: "All Parents", read: 850 },
+const initialNotices = [
+  { title: "Annual Sports Day — June 15", sent: "Jun 1", recipients: "All Parents", read: 820, fullText: "Please note that the Annual Sports Day is scheduled for June 15. All parents are invited to attend." },
+  { title: "Parent-Teacher Meeting — June 12", sent: "May 28", recipients: "Class 10 Parents", read: 240, fullText: "PTM will be held on June 12 from 9 AM to 1 PM. Please ensure your presence." },
+  { title: "Fee Payment Reminder — Q2", sent: "May 25", recipients: "Pending Fee Parents", read: 95, fullText: "This is a reminder to clear the pending fee for Q2 by the end of this month." },
+  { title: "Summer Vacation Notice", sent: "May 20", recipients: "All Parents", read: 850, fullText: "Summer vacations will begin from June 20th and schools will reopen on August 1st." },
 ];
 
 export default function InstitutionCommunication() {
@@ -27,6 +29,12 @@ export default function InstitutionCommunication() {
   });
   const [broadcastMsg, setBroadcastMsg] = useState("");
   const [broadcastTarget, setBroadcastTarget] = useState("All Parents");
+  
+  const [noticesList, setNoticesList] = useState(initialNotices);
+  const [parentSearch, setParentSearch] = useState("");
+  const [viewNotice, setViewNotice] = useState<any>(null);
+
+  const filteredParents = parents.filter(p => p.name.toLowerCase().includes(parentSearch.toLowerCase()) || p.student.toLowerCase().includes(parentSearch.toLowerCase()));
 
   const send = () => {
     if (!input.trim() || !selected) return;
@@ -37,6 +45,16 @@ export default function InstitutionCommunication() {
 
   const sendBroadcast = () => {
     if (!broadcastMsg.trim()) { toast.error("Write a message"); return; }
+    
+    const newNotice = {
+      title: broadcastMsg.length > 35 ? broadcastMsg.substring(0, 35) + "..." : broadcastMsg,
+      sent: "Just now",
+      recipients: broadcastTarget,
+      read: 0,
+      fullText: broadcastMsg
+    };
+    
+    setNoticesList(prev => [newNotice, ...prev]);
     toast.success(`Broadcast sent to ${broadcastTarget}!`);
     setBroadcastMsg("");
   };
@@ -57,11 +75,11 @@ export default function InstitutionCommunication() {
             <div className="p-4 border-b border-border">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                <input placeholder="Search parents..." className="w-full pl-8 pr-3 py-2 border border-border rounded-xl text-xs bg-background focus:outline-none" />
+                <input value={parentSearch} onChange={(e) => setParentSearch(e.target.value)} placeholder="Search parents or students..." className="w-full pl-8 pr-3 py-2 border border-border rounded-xl text-xs bg-background focus:outline-none" />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {parents.map((p) => (
+              {filteredParents.map((p) => (
                 <button key={p.id} onClick={() => setSelected(p)} className={cn("w-full flex items-center gap-3 p-4 border-b border-border hover:bg-muted/50 text-left transition-colors", selected?.id === p.id && "bg-primary/5 border-l-2 border-l-primary")}>
                   <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", p.color)}>{p.initials}</div>
                   <div className="flex-1 min-w-0">
@@ -133,8 +151,8 @@ export default function InstitutionCommunication() {
           <div className="bg-card border border-border rounded-2xl p-5">
             <h3 className="font-semibold mb-4">Recent Notices</h3>
             <div className="space-y-3">
-              {notices.map((n, i) => (
-                <div key={i} className="p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => toast.success(`Viewing: ${n.title}`)}>
+              {noticesList.map((n, i) => (
+                <div key={i} className="p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setViewNotice(n)}>
                   <div className="font-semibold text-sm">{n.title}</div>
                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                     <span>Sent: {n.sent}</span>
@@ -147,6 +165,33 @@ export default function InstitutionCommunication() {
           </div>
         </div>
       )}
+
+      {/* --- View Notice Modal --- */}
+      <Dialog open={!!viewNotice} onOpenChange={(open) => !open && setViewNotice(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Notice Details</DialogTitle>
+          </DialogHeader>
+          {viewNotice && (
+            <div className="py-4 space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg">{viewNotice.title}</h3>
+                <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                  <span><strong className="text-foreground">Sent:</strong> {viewNotice.sent}</span>
+                  <span><strong className="text-foreground">Recipients:</strong> {viewNotice.recipients}</span>
+                  <span className="text-accent"><strong className="text-foreground">Read by:</strong> {viewNotice.read}</span>
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-muted/30 border border-border text-sm leading-relaxed whitespace-pre-wrap">
+                {viewNotice.fullText}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setViewNotice(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

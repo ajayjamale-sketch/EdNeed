@@ -4,8 +4,12 @@ import { CheckCircle, XCircle, Clock, AlertTriangle, Download, Filter } from "lu
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
-const classAttendance = [
+const initialClassAttendance = [
   { class: "Class 8-A", present: 38, total: 42, pct: 90, teacher: "Ms. Rita Gupta" },
   { class: "Class 9-B", present: 35, total: 44, pct: 80, teacher: "Mr. Suresh Nair" },
   { class: "Class 10-A", present: 40, total: 44, pct: 91, teacher: "Dr. Anita Rao" },
@@ -21,6 +25,39 @@ const weeklyTrend = [
 
 export default function InstitutionAttendance() {
   const [date, setDate] = useState("2025-06-04");
+  const [data, setData] = useState(initialClassAttendance);
+  const [showAtRisk, setShowAtRisk] = useState(false);
+  
+  // Modal state
+  const [isMarkOpen, setIsMarkOpen] = useState(false);
+  const [formData, setFormData] = useState({ class: "Class 8-A", present: 0, total: 0 });
+
+  const filteredData = showAtRisk ? data.filter(c => c.pct < 75) : data;
+
+  const handleMarkAttendance = () => {
+    const selectedClass = data.find(c => c.class === formData.class) || data[0];
+    setFormData({ class: selectedClass.class, present: selectedClass.present, total: selectedClass.total });
+    setIsMarkOpen(true);
+  };
+
+  const handleSaveAttendance = () => {
+    const pct = Math.round((formData.present / formData.total) * 100) || 0;
+    setData(prev => prev.map(c => c.class === formData.class ? { ...c, present: formData.present, total: formData.total, pct } : c));
+    toast.success("Attendance updated successfully");
+    setIsMarkOpen(false);
+  };
+
+  const handleExport = () => {
+    const headers = ["Class,Teacher,Present,Total,Percentage"];
+    const csvData = data.map(c => `${c.class},${c.teacher},${c.present},${c.total},${c.pct}%`);
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "attendance_report.csv";
+    a.click();
+    toast.success("Exported attendance report");
+  };
 
   return (
     <DashboardLayout title="Attendance Management" subtitle="School-wide attendance tracking across all classes">
@@ -59,24 +96,26 @@ export default function InstitutionAttendance() {
         <div className="bg-card border border-border rounded-2xl p-5">
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            {[
-              { label: "Mark Today's Attendance", action: "Marking attendance for all classes..." },
-              { label: "Send Absent SMS to Parents", action: "Sending SMS notifications..." },
-              { label: "Download Monthly Report", action: "Downloading attendance report PDF..." },
-              { label: "View At-Risk Students", action: "Filtering students below 75%..." },
-            ].map((a, i) => (
-              <button key={i} onClick={() => toast.success(a.action)} className="w-full py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-left px-3">
-                {a.label}
-              </button>
-            ))}
+            <button onClick={handleMarkAttendance} className="w-full py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-left px-3">
+              Mark Today's Attendance
+            </button>
+            <button onClick={() => toast.success("Sending SMS notifications...")} className="w-full py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-left px-3">
+              Send Absent SMS to Parents
+            </button>
+            <button onClick={handleExport} className="w-full py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-left px-3">
+              Download Monthly Report
+            </button>
+            <button onClick={() => setShowAtRisk(!showAtRisk)} className={cn("w-full py-2.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-left px-3", showAtRisk && "bg-muted")}>
+              {showAtRisk ? "View All Students" : "View At-Risk Students"}
+            </button>
           </div>
         </div>
       </div>
 
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-border">
-          <h3 className="font-semibold">Class-wise Attendance — Today</h3>
-          <button onClick={() => toast.success("Downloading report...")} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
+          <h3 className="font-semibold">{showAtRisk ? "At-Risk Classes (<75%)" : "Class-wise Attendance — Today"}</h3>
+          <button onClick={handleExport} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
         </div>
@@ -90,7 +129,7 @@ export default function InstitutionAttendance() {
               </tr>
             </thead>
             <tbody>
-              {classAttendance.map((c, i) => (
+              {filteredData.map((c, i) => (
                 <tr key={i} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 text-sm font-medium">{c.class}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">{c.teacher}</td>
@@ -115,8 +154,56 @@ export default function InstitutionAttendance() {
               ))}
             </tbody>
           </table>
+          {filteredData.length === 0 && (
+            <div className="p-6 text-center text-sm text-muted-foreground">No classes found in this view.</div>
+          )}
         </div>
       </div>
+
+      {/* --- Mark Attendance Modal --- */}
+      <Dialog open={isMarkOpen} onOpenChange={setIsMarkOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Mark Class Attendance</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="class-select">Select Class</Label>
+              <select 
+                id="class-select" 
+                value={formData.class} 
+                onChange={(e) => {
+                  const selected = data.find(c => c.class === e.target.value);
+                  if (selected) setFormData({ ...formData, class: selected.class, present: selected.present, total: selected.total });
+                }} 
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {data.map(c => <option key={c.class} value={c.class}>{c.class}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="present-count">Present</Label>
+                <Input id="present-count" type="number" min="0" max={formData.total} value={formData.present} onChange={(e) => setFormData({ ...formData, present: Number(e.target.value) })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="total-count">Total Students</Label>
+                <Input id="total-count" type="number" min="0" value={formData.total} onChange={(e) => setFormData({ ...formData, total: Number(e.target.value) })} />
+              </div>
+            </div>
+            <div className="mt-2 p-3 bg-muted/50 rounded-lg text-center">
+              <span className="text-sm text-muted-foreground">Calculated Percentage: </span>
+              <span className={cn("font-bold", (formData.present / formData.total) >= 0.75 ? "text-accent" : "text-destructive")}>
+                {Math.round((formData.present / formData.total) * 100) || 0}%
+              </span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMarkOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveAttendance}>Save Attendance</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
