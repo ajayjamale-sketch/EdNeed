@@ -4,16 +4,20 @@ import { Link } from "react-router-dom";
 import { Search, Clock, Tag, ArrowRight, BookOpen, TrendingUp, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const posts = [
+// Extended posts array – includes all course articles
+export const posts = [
   { slug: "how-to-crack-jee-advanced", title: "How to Crack JEE Advanced 2025: A Complete Strategy Guide", excerpt: "Learn the proven strategies, study schedules, and resources that top JEE rankers use to secure their dream IIT seat.", category: "Exam Prep", readTime: "8 min", date: "May 28, 2025", author: { name: "Dr. Ramesh Gupta", initials: "RG", role: "JEE Expert" }, featured: true, tag: "trending" },
+  { slug: "neet-2025-biology-tips", title: "NEET 2025: High‑Yield Biology Topics You Must Master", excerpt: "A data-driven analysis of the most frequently tested NEET biology chapters from the last 5 years, with study tips.", category: "NEET Prep", readTime: "7 min", date: "May 25, 2025", author: { name: "Dr. Sunita Reddy", initials: "SR", role: "NEET Faculty" }, featured: false, tag: "popular" },
+  { slug: "upsc-2026-strategy", title: "UPSC CSE 2026: A 12‑Month Roadmap for Beginners", excerpt: "A complete phased strategy to crack the UPSC Civil Services Exam – from NCERTs to answer writing and mocks.", category: "UPSC", readTime: "10 min", date: "May 20, 2025", author: { name: "Vikram Singh", initials: "VS", role: "IAS (Retd.)" }, featured: false, tag: "new" },
+  { slug: "cat-2025-quant-guide", title: "CAT 2025: How to Score 99+ Percentile in Quantitative Aptitude", excerpt: "Topic prioritisation, daily practice framework, and the error‑log method to master CAT Quant.", category: "MBA Prep", readTime: "6 min", date: "May 18, 2025", author: { name: "Arjun Mehta", initials: "AM", role: "IIM Alumnus" }, featured: false, tag: "" },
   { slug: "ai-study-assistant-guide", title: "Getting the Most Out of EdNeed's AI Study Assistant", excerpt: "Discover how to leverage AI-powered doubt solving, personalized study planning, and adaptive learning to boost your scores.", category: "Platform Guide", readTime: "5 min", date: "May 22, 2025", author: { name: "Priya Nair", initials: "PN", role: "EdNeed CTO" }, featured: false, tag: "popular" },
-  { slug: "neet-biology-tips", title: "NEET Biology: High-Yield Topics You Must Master", excerpt: "A data-driven analysis of the most frequently tested NEET biology chapters from the last 5 years, with study tips.", category: "NEET Prep", readTime: "6 min", date: "May 18, 2025", author: { name: "Dr. Ananya Singh", initials: "AS", role: "Biology Expert" }, featured: false, tag: "new" },
-  { slug: "career-counseling-importance", title: "Why Career Counseling in Class 9 Changes Everything", excerpt: "Starting career planning early gives students a massive advantage. Here's why — and how EdNeed's counseling tools help.", category: "Career Guidance", readTime: "4 min", date: "May 12, 2025", author: { name: "Arun Menon", initials: "AM", role: "Career Counselor" }, featured: false, tag: "" },
   { slug: "teacher-income-guide", title: "How Teachers Earn ₹1 Lakh+/Month on EdNeed", excerpt: "A complete guide to setting up your teaching profile, creating high-demand courses, and scaling your income on EdNeed.", category: "For Teachers", readTime: "7 min", date: "May 5, 2025", author: { name: "Kavitha Nair", initials: "KN", role: "Top Educator" }, featured: false, tag: "popular" },
   { slug: "scholarship-hunt-guide", title: "10 Scholarships Every Indian Student Should Apply for in 2025", excerpt: "From government grants to private fellowships — a curated list of scholarships with high success rates and how to apply.", category: "Scholarships", readTime: "9 min", date: "April 28, 2025", author: { name: "Sneha Kapoor", initials: "SK", role: "EdNeed Team" }, featured: false, tag: "new" },
+  { slug: "career-counseling-importance", title: "Why Career Counseling in Class 9 Changes Everything", excerpt: "Starting career planning early gives students a massive advantage. Here's why — and how EdNeed's counseling tools help.", category: "Career Guidance", readTime: "4 min", date: "May 12, 2025", author: { name: "Arun Menon", initials: "AM", role: "Career Counselor" }, featured: false, tag: "" }
 ];
 
-const categories = ["All", "Exam Prep", "Platform Guide", "NEET Prep", "Career Guidance", "For Teachers", "Scholarships"];
+// Dynamically generate categories from posts (including "All")
+const categories = ["All", ...new Set(posts.map(p => p.category))];
 
 const tagColor: Record<string, string> = {
   trending: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",

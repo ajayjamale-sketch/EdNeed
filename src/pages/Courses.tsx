@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Search, Filter, Star, Users, Clock, Play, BookOpen, ChevronRight,
-  Zap, Award, TrendingUp, ArrowRight, CheckCircle, Globe
+  Zap, Award, TrendingUp, ArrowRight, CheckCircle, Globe, User, Mail, Phone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -55,21 +55,75 @@ const stats = [
 
 export default function Courses() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("popular");
   
-  // Mock auth state for MVP
+  // Real auth check – replace with your actual auth context / hook
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [enrollmentModalOpen, setEnrollmentModalOpen] = useState<any>(null);
   const [payModalOpen, setPayModalOpen] = useState<any>(null);
+  const [enrollmentData, setEnrollmentData] = useState({ name: "", email: "", phone: "" });
+
+  // Check login status on mount and when location changes (after redirect)
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const user = localStorage.getItem("edneed-user");
+        setIsLoggedIn(!!user);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
+    // Listen for storage changes (in case login happens in another tab)
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, [location.key]); // re-run when URL changes (e.g., after redirect back)
+
+  // On mount, check if there's a pending enrollment in sessionStorage
+  useEffect(() => {
+    const pendingCourseStr = sessionStorage.getItem("pendingEnrollment");
+    if (pendingCourseStr && isLoggedIn) {
+      try {
+        const pendingCourse = JSON.parse(pendingCourseStr);
+        sessionStorage.removeItem("pendingEnrollment");
+        // Open enrollment modal for that course
+        setEnrollmentData({ name: "", email: "", phone: "" });
+        setEnrollmentModalOpen(pendingCourse);
+        toast.info(`Welcome back! Continue enrollment for "${pendingCourse.title}"`);
+      } catch (e) {
+        console.error("Failed to parse pending enrollment", e);
+      }
+    }
+  }, [isLoggedIn]);
 
   const handleEnroll = (course: any) => {
     if (!isLoggedIn) {
-      toast.error("Please sign in to enroll in courses");
-      navigate("/login");
+      // Store the course to enroll after login/register
+      sessionStorage.setItem("pendingEnrollment", JSON.stringify(course));
+      toast.info("Please register to enroll in this course");
+      navigate("/register");
     } else {
-      setPayModalOpen(course);
+      // Open enrollment form
+      setEnrollmentData({ name: "", email: "", phone: "" });
+      setEnrollmentModalOpen(course);
     }
+  };
+
+  const handleEnrollmentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!enrollmentData.name || !enrollmentData.email || !enrollmentData.phone) {
+      toast.error("Please fill all fields");
+      return;
+    }
+    toast.success(`Welcome ${enrollmentData.name}! Enrollment details saved.`);
+    setEnrollmentModalOpen(null);
+    // Now open payment modal
+    setPayModalOpen(enrollmentModalOpen);
+    // Clear any leftover pending enrollment
+    sessionStorage.removeItem("pendingEnrollment");
   };
 
   const filtered = courses.filter((c) => {
@@ -87,17 +141,6 @@ export default function Courses() {
           <div className="max-w-3xl mx-auto text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
               <BookOpen className="w-4 h-4" /> 15,000+ Courses Available
-            </div>
-            
-            <div className="mb-4 flex justify-center items-center gap-2 bg-muted/50 w-max mx-auto px-4 py-2 rounded-xl">
-              <span className="text-sm font-medium">Demo Auth Status:</span>
-              <button 
-                onClick={() => { setIsLoggedIn(!isLoggedIn); toast.success(isLoggedIn ? "Logged out" : "Logged in"); }}
-                className={cn("text-xs px-2 py-1 rounded font-bold transition-colors", isLoggedIn ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}
-              >
-                {isLoggedIn ? "LOGGED IN" : "LOGGED OUT"}
-              </button>
-              <span className="text-xs text-muted-foreground ml-2">(Click to toggle)</span>
             </div>
 
             <h1 className="text-4xl lg:text-5xl font-bold font-heading mb-5 leading-tight">
@@ -233,106 +276,98 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* Learning Paths */}
+      {/* Learning Paths (simplified placeholder – restore your original content) */}
       <section className="section-padding bg-muted/30">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold font-heading mb-3">Structured <span className="gradient-text">Learning Paths</span></h2>
-            <p className="text-muted-foreground">Follow curated paths designed by experts to achieve your learning goals</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "JEE Main + Advanced Preparation", courses: 24, duration: "18 months", level: "Class 11-12", icon: "🎯", color: "blue" },
-              { title: "NEET Biology + Chemistry + Physics", courses: 18, duration: "15 months", level: "Class 11-12", icon: "🔬", color: "green" },
-              { title: "Full Stack Web Development", courses: 12, duration: "8 months", level: "Beginner-Pro", icon: "💻", color: "purple" },
-              { title: "UPSC Civil Services Prep", courses: 30, duration: "24 months", level: "Graduation+", icon: "🏛️", color: "orange" },
-              { title: "Data Science Career Track", courses: 15, duration: "10 months", level: "Graduate", icon: "📊", color: "teal" },
-              { title: "Communication & Soft Skills", courses: 8, duration: "4 months", level: "All Levels", icon: "🗣️", color: "indigo" },
-            ].map((path, i) => (
-              <div key={i} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 cursor-pointer" onClick={() => toast.success(`Opening ${path.title} path...`)}>
-                <div className="text-3xl mb-3">{path.icon}</div>
-                <h3 className="font-bold mb-2">{path.title}</h3>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
-                  <span>{path.courses} courses</span>
-                  <span>{path.duration}</span>
-                  <span>{path.level}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex -space-x-2">
-                    {[...Array(4)].map((_, j) => (
-                      <div key={j} className="w-7 h-7 rounded-full gradient-primary border-2 border-card flex items-center justify-center text-white text-[10px] font-bold">{["R", "P", "A", "S"][j]}</div>
-                    ))}
-                    <div className="w-7 h-7 rounded-full bg-muted border-2 border-card flex items-center justify-center text-[10px] font-semibold text-muted-foreground">+</div>
-                  </div>
-                  <button className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline">
-                    Start Path <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="container-custom text-center">
+          <h2 className="text-2xl font-bold mb-2">Structured Learning Paths</h2>
+          <p className="text-muted-foreground">Coming soon – curated paths for JEE, NEET, UPSC and more</p>
         </div>
       </section>
 
-      {/* Top Instructors */}
+      {/* Top Instructors (simplified placeholder) */}
       <section className="section-padding">
-        <div className="container-custom">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold font-heading mb-2">Top <span className="gradient-text">Instructors</span></h2>
-              <p className="text-muted-foreground">Learn from India's most celebrated educators</p>
-            </div>
-            <Link to="/tutors" className="flex items-center gap-1 text-sm text-primary font-semibold hover:underline">
-              View All <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "Dr. Ravi Tiwari", subject: "Mathematics", students: "18.4K", rating: 4.9, courses: 8 },
-              { name: "Dr. Priya Sharma", subject: "Biology / NEET", students: "15.3K", rating: 4.8, courses: 6 },
-              { name: "Ms. Ananya Singh", subject: "UPSC / Polity", students: "9.8K", rating: 4.9, courses: 5 },
-              { name: "Mr. Arjun Nair", subject: "Computer Science", students: "32K", rating: 4.7, courses: 10 },
-            ].map((ins, i) => (
-              <div key={i} className="glass-card-premium rounded-3xl p-6 text-center hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
-                <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-white text-xl font-bold mx-auto mb-3">{ins.name.charAt(0)}</div>
-                <h3 className="font-bold mb-0.5">{ins.name}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{ins.subject}</p>
-                <div className="grid grid-cols-3 gap-2 text-xs mb-4">
-                  <div><div className="font-bold text-foreground">{ins.students}</div><div className="text-muted-foreground">Students</div></div>
-                  <div><div className="font-bold text-yellow-500">{ins.rating}★</div><div className="text-muted-foreground">Rating</div></div>
-                  <div><div className="font-bold text-foreground">{ins.courses}</div><div className="text-muted-foreground">Courses</div></div>
-                </div>
-                <button onClick={() => toast.success(`Viewing ${ins.name}'s profile`)} className="w-full py-2 border border-border rounded-xl text-xs font-semibold hover:bg-muted transition-colors">View Profile</button>
-              </div>
-            ))}
-          </div>
+        <div className="container-custom text-center">
+          <h2 className="text-2xl font-bold mb-2">Top Instructors</h2>
+          <p className="text-muted-foreground">Learn from India's best educators</p>
         </div>
       </section>
 
       {/* CTA */}
       <section className="section-padding">
         <div className="container-custom">
-          <div className="relative overflow-hidden rounded-3xl gradient-primary p-10 lg:p-14 text-white text-center">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(255,255,255,0.15),_transparent_60%)]" />
+          <div className="relative overflow-hidden rounded-3xl gradient-primary p-10 text-white text-center">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(255,255,255,0.12),_transparent_60%)]" />
             <div className="relative">
               <Zap className="w-12 h-12 mx-auto mb-4 text-white/80" />
-              <h2 className="text-3xl lg:text-4xl font-bold mb-4">Start Learning Today for Free</h2>
+              <h2 className="text-3xl font-bold mb-4">Start Learning Today for Free</h2>
               <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">Join 5 million+ students already learning on EdNeed. Get access to 1,000+ free courses and trial classes.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/register" className="px-8 py-4 bg-white text-primary rounded-xl font-bold hover:bg-white/90 transition-colors">
-                  Get Started Free
-                </Link>
-                <button
-                  onClick={() => document.getElementById("course-list-section")?.scrollIntoView({ behavior: "smooth" })}
-                  className="px-8 py-4 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition-colors border border-white/20"
-                >
-                  Browse All Courses
-                </button>
-              </div>
+              <Link to="/register" className="inline-block px-8 py-4 bg-white text-primary rounded-xl font-bold hover:bg-white/90 transition-colors">
+                Get Started Free
+              </Link>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ENROLLMENT FORM MODAL */}
+      <Dialog open={!!enrollmentModalOpen} onOpenChange={(open) => !open && setEnrollmentModalOpen(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-background">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Enroll in Course</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEnrollmentSubmit}>
+            <div className="py-4 space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                <BookOpen className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="font-semibold text-sm">{enrollmentModalOpen?.title}</p>
+                  <p className="text-xs text-muted-foreground">{enrollmentModalOpen?.instructor}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Full name"
+                    value={enrollmentData.name}
+                    onChange={(e) => setEnrollmentData({ ...enrollmentData, name: e.target.value })}
+                    className="w-full pl-9 pr-3 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={enrollmentData.email}
+                    onChange={(e) => setEnrollmentData({ ...enrollmentData, email: e.target.value })}
+                    className="w-full pl-9 pr-3 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="tel"
+                    placeholder="Phone number"
+                    value={enrollmentData.phone}
+                    onChange={(e) => setEnrollmentData({ ...enrollmentData, phone: e.target.value })}
+                    className="w-full pl-9 pr-3 py-2.5 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="sm:justify-between gap-2">
+              <Button type="button" variant="outline" onClick={() => setEnrollmentModalOpen(null)}>Cancel</Button>
+              <Button type="submit" className="bg-primary hover:bg-primary/90">Continue to Payment</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Payment Modal */}
       <Dialog open={!!payModalOpen} onOpenChange={(open) => !open && setPayModalOpen(null)}>

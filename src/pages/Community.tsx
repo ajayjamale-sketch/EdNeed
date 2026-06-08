@@ -4,7 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Users, MessageSquare, BookOpen, Trophy, Heart, Search,
   Plus, ThumbsUp, Share2, ChevronRight, ArrowRight, Zap,
-  Globe, Star, Hash, Bell, TrendingUp
+  Globe, Star, Hash, Bell, TrendingUp, Crown, Medal,
+  FlaskConical, Code2, Landmark, PenTool, Calculator,
+  GraduationCap, Award
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -12,12 +14,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 
 const studyGroups = [
-  { id: 1, name: "JEE 2026 Warriors", subject: "JEE Prep", members: 4820, posts: 1230, active: true, tag: "Competitive Exams", description: "Daily problem-solving sessions for JEE Main and Advanced aspirants.", emoji: "⚡" },
-  { id: 2, name: "NEET Biology Masters", subject: "Biology / NEET", members: 3650, posts: 890, active: true, tag: "Medical", description: "Detailed discussions on botany, zoology, and human physiology for NEET prep.", emoji: "🔬" },
-  { id: 3, name: "CBSE Class 12 Study Circle", subject: "CBSE", members: 8920, posts: 3200, active: false, tag: "School", description: "Board exam preparation, important questions, and revision notes for Class 12.", emoji: "📚" },
-  { id: 4, name: "Python & DSA Learners", subject: "Computer Science", members: 6100, posts: 2100, active: true, tag: "Technology", description: "Practice data structures, algorithms, and competitive programming together.", emoji: "💻" },
-  { id: 5, name: "UPSC Discussion Forum", subject: "Civil Services", members: 5200, posts: 1800, active: false, tag: "UPSC", description: "Daily current affairs, GS discussions, and essay writing practice.", emoji: "🏛️" },
-  { id: 6, name: "Creative Writing Workshop", subject: "English", members: 1840, posts: 540, active: true, tag: "Languages", description: "Improve writing skills with weekly prompts, feedback sessions, and grammar tips.", emoji: "✍️" },
+  { id: 1, name: "JEE 2026 Warriors", subject: "JEE Prep", members: 4820, posts: 1230, active: true, tag: "Competitive Exams", description: "Daily problem-solving sessions for JEE Main and Advanced aspirants.", icon: Zap },
+  { id: 2, name: "NEET Biology Masters", subject: "Biology / NEET", members: 3650, posts: 890, active: true, tag: "Medical", description: "Detailed discussions on botany, zoology, and human physiology for NEET prep.", icon: FlaskConical },
+  { id: 3, name: "CBSE Class 12 Study Circle", subject: "CBSE", members: 8920, posts: 3200, active: false, tag: "School", description: "Board exam preparation, important questions, and revision notes for Class 12.", icon: BookOpen },
+  { id: 4, name: "Python & DSA Learners", subject: "Computer Science", members: 6100, posts: 2100, active: true, tag: "Technology", description: "Practice data structures, algorithms, and competitive programming together.", icon: Code2 },
+  { id: 5, name: "UPSC Discussion Forum", subject: "Civil Services", members: 5200, posts: 1800, active: false, tag: "UPSC", description: "Daily current affairs, GS discussions, and essay writing practice.", icon: Landmark },
+  { id: 6, name: "Creative Writing Workshop", subject: "English", members: 1840, posts: 540, active: true, tag: "Languages", description: "Improve writing skills with weekly prompts, feedback sessions, and grammar tips.", icon: PenTool },
 ];
 
 const discussions = [
@@ -29,10 +31,10 @@ const discussions = [
 ];
 
 const challenges = [
-  { title: "100 Days of Problem Solving", participants: 8420, icon: "🏆", deadline: "Jun 30, 2025", prize: "Certificate + EdNeed Pro" },
-  { title: "Weekly Chemistry Quiz", participants: 3200, icon: "🧪", deadline: "Every Sunday", prize: "Top scorer badge" },
-  { title: "Essay Writing Competition", participants: 1840, icon: "✍️", deadline: "Jul 15, 2025", prize: "₹10,000 prize money" },
-  { title: "Math Olympiad Practice Series", participants: 5600, icon: "📐", deadline: "Ongoing", prize: "Leaderboard ranking" },
+  { title: "100 Days of Problem Solving", participants: 8420, icon: Trophy, deadline: "Jun 30, 2025", prize: "Certificate + EdNeed Pro" },
+  { title: "Weekly Chemistry Quiz", participants: 3200, icon: FlaskConical, deadline: "Every Sunday", prize: "Top scorer badge" },
+  { title: "Essay Writing Competition", participants: 1840, icon: PenTool, deadline: "Jul 15, 2025", prize: "₹10,000 prize money" },
+  { title: "Math Olympiad Practice Series", participants: 5600, icon: Calculator, deadline: "Ongoing", prize: "Leaderboard ranking" },
 ];
 
 const tags = ["All Topics", "JEE", "NEET", "CBSE", "UPSC", "Coding", "Study Tips", "Resources", "Motivation"];
@@ -201,7 +203,9 @@ export default function Community() {
               <div key={group.id} className="glass-card-premium rounded-3xl p-8 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">{group.emoji}</div>
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <group.icon className="w-6 h-6 text-primary" />
+                    </div>
                     <div>
                       <h3 className="font-bold text-sm">{group.name}</h3>
                       <span className="text-xs text-primary font-medium">{group.subject}</span>
@@ -281,7 +285,9 @@ export default function Community() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {challenges.map((c, i) => (
               <div key={i} className="glass-card-premium rounded-3xl p-6 hover:border-primary/40 hover:-translate-y-2 transition-all duration-300 text-center flex flex-col h-full">
-                <div className="text-3xl mb-3">{c.icon}</div>
+                <div className="flex justify-center mb-3">
+                  <c.icon className="w-8 h-8 text-primary" />
+                </div>
                 <h3 className="font-bold text-sm mb-2">{c.title}</h3>
                 <div className="text-xs text-muted-foreground mb-1"><Users className="w-3 h-3 inline mr-1" />{c.participants.toLocaleString()} participants</div>
                 <div className="text-xs text-muted-foreground mb-1"><Bell className="w-3 h-3 inline mr-1" />Ends: {c.deadline}</div>
@@ -311,14 +317,19 @@ export default function Community() {
               </p>
               <div className="space-y-3">
                 {[
-                  { rank: "🥇", name: "Arjun Sharma", points: "12,840", badge: "Champion" },
-                  { rank: "🥈", name: "Priya Mehta", points: "11,210", badge: "Expert" },
-                  { rank: "🥉", name: "Rahul Nair", points: "10,580", badge: "Leader" },
-                  { rank: "4", name: "Sneha Roy", points: "9,940", badge: "Pro" },
-                  { rank: "5", name: "Vikram Singh", points: "9,340", badge: "Pro" },
+                  { rank: 1, name: "Arjun Sharma", points: "12,840", badge: "Champion", icon: Crown },
+                  { rank: 2, name: "Priya Mehta", points: "11,210", badge: "Expert", icon: Medal },
+                  { rank: 3, name: "Rahul Nair", points: "10,580", badge: "Leader", icon: Medal },
+                  { rank: 4, name: "Sneha Roy", points: "9,940", badge: "Pro", icon: Star },
+                  { rank: 5, name: "Vikram Singh", points: "9,340", badge: "Pro", icon: Star },
                 ].map((user, i) => (
                   <div key={i} className="flex items-center gap-3 bg-card border border-border rounded-xl p-3">
-                    <div className="w-8 text-center text-lg">{user.rank}</div>
+                    <div className="w-8 text-center flex justify-center">
+                      {user.rank === 1 && <Crown className="w-5 h-5 text-yellow-500" />}
+                      {user.rank === 2 && <Medal className="w-5 h-5 text-gray-400" />}
+                      {user.rank === 3 && <Medal className="w-5 h-5 text-amber-600" />}
+                      {user.rank > 3 && <span className="text-sm font-bold">{user.rank}</span>}
+                    </div>
                     <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white text-xs font-bold">{user.name.charAt(0)}</div>
                     <div className="flex-1">
                       <div className="text-sm font-semibold">{user.name}</div>
@@ -374,6 +385,7 @@ export default function Community() {
           </div>
         </div>
       </section>
+
       {/* Join Group Dialog */}
       <Dialog open={!!selectedGroup} onOpenChange={(open) => !open && setSelectedGroup(null)}>
         <DialogContent className="sm:max-w-[420px] bg-background border border-border rounded-3xl p-6 shadow-2xl">

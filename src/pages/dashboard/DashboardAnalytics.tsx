@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { BarChart3, TrendingUp, TrendingDown, Target, Award, AlertTriangle, CheckCircle } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Target, Award, AlertTriangle, CheckCircle, Zap, Ruler, Beaker, Dna } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   AreaChart, Area, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis,
@@ -32,10 +32,10 @@ const radarData = [
 ];
 
 const weakTopics = [
-  { topic: "Thermodynamics", subject: "Physics", accuracy: 42, icon: "⚡" },
-  { topic: "Coordinate Geometry", subject: "Mathematics", accuracy: 55, icon: "📐" },
-  { topic: "Ionic Equilibrium", subject: "Chemistry", accuracy: 58, icon: "⚗️" },
-  { topic: "Genetics", subject: "Biology", accuracy: 61, icon: "🧬" },
+  { topic: "Thermodynamics", subject: "Physics", accuracy: 42, icon: Zap },
+  { topic: "Coordinate Geometry", subject: "Mathematics", accuracy: 55, icon: Ruler },
+  { topic: "Ionic Equilibrium", subject: "Chemistry", accuracy: 58, icon: Beaker },
+  { topic: "Genetics", subject: "Biology", accuracy: 61, icon: Dna },
 ];
 
 const attendanceData = [
@@ -158,7 +158,7 @@ export default function DashboardAnalytics() {
               <div key={i} className="p-3 rounded-xl bg-yellow-50/50 dark:bg-yellow-950/20 border border-yellow-200/50 dark:border-yellow-900/50">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{t.icon}</span>
+                    <t.icon className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                     <div>
                       <div className="text-sm font-semibold">{t.topic}</div>
                       <div className="text-xs text-muted-foreground">{t.subject}</div>

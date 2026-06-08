@@ -27,6 +27,46 @@ const posts: Record<string, {
       { type: "para", text: "JEE preparation is a marathon, not a sprint. Maintain 7-8 hours of sleep, take one day off per week for recreation, and practice mindfulness. Many top rankers credit their consistency — not their intelligence — as the key differentiator." },
     ]
   },
+  "neet-2025-biology-tips": {
+    title: "NEET 2025: High‑Yield Biology Topics You Must Master",
+    category: "NEET Prep", readTime: "7 min", date: "May 25, 2025",
+    author: { name: "Dr. Sunita Reddy", initials: "SR", role: "NEET Faculty & Biologist", bio: "Dr. Sunita Reddy has guided over 10,000 NEET aspirants. Her students regularly feature in the top 500 all‑India ranks." },
+    content: [
+      { type: "para", text: "NEET Biology carries 50% of the total marks – mastering it can make or break your rank. This guide focuses on the most repeated, high‑yield topics." },
+      { type: "heading", heading: "Zoology Focus Areas" },
+      { type: "list", items: ["Human Physiology: Digestive, Respiratory, Circulatory systems", "Genetics & Evolution: Mendel’s laws, DNA replication, Hardy‑Weinberg", "Reproduction: Gametogenesis, menstrual cycle, reproductive health"] },
+      { type: "heading", heading: "Botany Focus Areas" },
+      { type: "list", items: ["Plant Physiology: Photosynthesis, transpiration, plant hormones", "Ecology: Ecosystem, biodiversity, environmental issues", "Cell Biology: Cell division, cell cycle, biomolecules"] },
+      { type: "heading", heading: "Proven Study Technique" },
+      { type: "para", text: "Use the Feynman technique – teach each concept aloud as if explaining to a beginner. This exposes gaps in understanding. Pair this with EdNeed's topic‑wise quizzes that adapt to your weak areas." },
+    ]
+  },
+  "upsc-2026-strategy": {
+    title: "UPSC CSE 2026: A 12‑Month Roadmap for Beginners",
+    category: "UPSC", readTime: "10 min", date: "May 20, 2025",
+    author: { name: "Vikram Singh", initials: "VS", role: "IAS (Retd.) & Mentor", bio: "Vikram Singh served as an IAS officer for 25 years. He now mentors UPSC aspirants through EdNeed." },
+    content: [
+      { type: "para", text: "Cracking UPSC Civil Services Exam requires a structured, long‑term approach. This roadmap divides your preparation into three clear phases." },
+      { type: "heading", heading: "Phase 1: Foundation (Months 1‑4)" },
+      { type: "list", items: ["NCERTs: Read all Class 6‑12 NCERTs (History, Geography, Polity, Economy, Science)", "Build a daily newspaper habit (The Hindu or Indian Express)", "Start making short notes – revise them weekly"] },
+      { type: "heading", heading: "Phase 2: Advanced & Answer Writing (Months 5‑9)" },
+      { type: "para", text: "Switch to standard reference books (Laxmikanth, Spectrum, GC Leong). Join a test series – write at least 2 answers daily. EdNeed's AI feedback helps you improve structure, keywords, and presentation." },
+      { type: "heading", heading: "Phase 3: Revision & Mocks (Months 10‑12)" },
+      { type: "list", items: ["Revise your notes three times", "Take full‑length Prelims and Mains mocks under timed conditions", "Analyze every mistake and revisit the concept"] },
+    ]
+  },
+  "cat-2025-quant-guide": {
+    title: "CAT 2025: How to Score 99+ Percentile in Quantitative Aptitude",
+    category: "MBA Prep", readTime: "6 min", date: "May 18, 2025",
+    author: { name: "Arjun Mehta", initials: "AM", role: "IIM Bangalore Alumnus & CAT Trainer", bio: "Arjun scored 99.8 percentile in CAT 2020. He has taught quant to 5,000+ students." },
+    content: [
+      { type: "para", text: "Quantitative Aptitude is often the make‑or‑break section for CAT. Here's a focused strategy to master it." },
+      { type: "heading", heading: "Topic Prioritisation" },
+      { type: "list", items: ["Arithmetic: Percentages, Profit/Loss, Time & Work, Ratios (highest weightage)", "Algebra: Quadratic equations, functions, logarithms", "Geometry: Triangles, circles, coordinate geometry", "Number System: Remainders, factors, divisibility"] },
+      { type: "heading", heading: "Practice Framework" },
+      { type: "para", text: "Solve 30‑40 quality questions per day. Use EdNeed's adaptive quizzes that learn your weak topics and serve similar questions until you master them. Review all mistakes – maintain an error log." },
+    ]
+  },
   "ai-study-assistant-guide": {
     title: "Getting the Most Out of EdNeed's AI Study Assistant",
     category: "Platform Guide", readTime: "5 min", date: "May 22, 2025",
@@ -44,9 +84,11 @@ const posts: Record<string, {
 };
 
 const relatedPosts = [
-  { slug: "neet-biology-tips", title: "NEET Biology: High-Yield Topics You Must Master", category: "NEET Prep", readTime: "6 min" },
+  { slug: "how-to-crack-jee-advanced", title: "How to Crack JEE Advanced 2025: A Complete Strategy Guide", category: "Exam Prep", readTime: "8 min" },
+  { slug: "neet-2025-biology-tips", title: "NEET 2025: High‑Yield Biology Topics You Must Master", category: "NEET Prep", readTime: "7 min" },
+  { slug: "upsc-2026-strategy", title: "UPSC CSE 2026: A 12‑Month Roadmap for Beginners", category: "UPSC", readTime: "10 min" },
+  { slug: "cat-2025-quant-guide", title: "CAT 2025: How to Score 99+ Percentile in Quantitative Aptitude", category: "MBA Prep", readTime: "6 min" },
   { slug: "ai-study-assistant-guide", title: "Getting the Most Out of EdNeed's AI Study Assistant", category: "Platform Guide", readTime: "5 min" },
-  { slug: "scholarship-hunt-guide", title: "10 Scholarships Every Indian Student Should Apply for", category: "Scholarships", readTime: "9 min" },
 ];
 
 export default function BlogPost() {
@@ -160,7 +202,7 @@ export default function BlogPost() {
           <div className="mt-14 pt-10 border-t border-border">
             <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
             <div className="grid sm:grid-cols-3 gap-5">
-              {relatedPosts.filter((r) => r.slug !== slug).map((r) => (
+              {relatedPosts.filter((r) => r.slug !== slug).slice(0, 3).map((r) => (
                 <Link key={r.slug} to={`/blog/${r.slug}`} className="group p-5 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all card-hover">
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">{r.category}</span>
                   <h4 className="font-semibold text-sm mt-3 mb-2 leading-snug group-hover:text-primary transition-colors line-clamp-2">{r.title}</h4>

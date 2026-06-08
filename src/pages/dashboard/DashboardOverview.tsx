@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
   BookOpen, Clock, Trophy, TrendingUp, Target, Calendar, Play,
-  Brain, ChevronRight, Flame, BarChart2, Zap
+  Brain, ChevronRight, Flame, BarChart2, Zap, Hand
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -49,10 +49,10 @@ const upcoming = [
 ];
 
 const achievements = [
-  { icon: "🔥", title: "7-Day Streak", desc: "Studied 7 days in a row" },
-  { icon: "⚡", title: "Fast Learner", desc: "Completed 5 lessons in a day" },
-  { icon: "🎯", title: "Perfect Score", desc: "100% on Chemistry Quiz" },
-  { icon: "🏆", title: "Top 10%", desc: "Among JEE aspirants" },
+  { icon: Flame, title: "7-Day Streak", desc: "Studied 7 days in a row" },
+  { icon: Zap, title: "Fast Learner", desc: "Completed 5 lessons in a day" },
+  { icon: Target, title: "Perfect Score", desc: "100% on Chemistry Quiz" },
+  { icon: Trophy, title: "Top 10%", desc: "Among JEE aspirants" },
 ];
 
 const colorMap: Record<string, string> = {
@@ -74,7 +74,7 @@ export default function DashboardOverview() {
   const [activeTab, setActiveTab] = useState<"hours" | "score">("hours");
 
   return (
-    <DashboardLayout title={`Good morning, ${user?.name?.split(" ")[0]} 👋`} subtitle="Here's your academic overview for today">
+    <DashboardLayout title={`Good morning, ${user?.name?.split(" ")[0]} `} subtitle="Here's your academic overview for today">
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
@@ -224,8 +224,11 @@ export default function DashboardOverview() {
           <div className="grid grid-cols-2 gap-3">
             {achievements.map((a, i) => (
               <div key={i} className="p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors">
-                <div className="text-xs font-semibold">{a.title}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{a.desc}</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <a.icon className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-semibold">{a.title}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">{a.desc}</div>
               </div>
             ))}
           </div>
@@ -251,6 +254,11 @@ export default function DashboardOverview() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Hand icon after greeting – positioned inline with the title */}
+      <div className="fixed hidden">
+        {/* The Hand icon is added as a separate element in the title */}
       </div>
     </DashboardLayout>
   );

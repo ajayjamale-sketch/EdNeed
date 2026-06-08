@@ -8,13 +8,15 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+import { Heart, Cpu, Landmark,  Palette, Microscope } from "lucide-react";
+
 const careerPaths = [
-  { icon: "⚕️", title: "Medicine & Healthcare", paths: ["MBBS", "BDS", "Nursing", "Pharmacy", "Ayurveda"], color: "green", exams: ["NEET UG", "AIIMS", "JIPMER"] },
-  { icon: "⚙️", title: "Engineering & Technology", paths: ["Computer Science", "Electronics", "Mechanical", "Civil", "AI/ML"], color: "blue", exams: ["JEE Main", "JEE Advanced", "BITSAT"] },
-  { icon: "🏛️", title: "Civil Services & Law", paths: ["IAS/IPS", "State PSC", "Judiciary", "Corporate Law", "LLB"], color: "purple", exams: ["UPSC CSE", "CLAT", "AILET"] },
-  { icon: "💰", title: "Commerce & Finance", paths: ["CA", "MBA", "Banking", "Investment", "Insurance"], color: "orange", exams: ["CAT", "CLAT", "CA Foundation"] },
-  { icon: "🎨", title: "Design & Creative Arts", paths: ["Architecture", "Fashion Design", "UX/UI", "Animation", "Fine Arts"], color: "pink", exams: ["NATA", "NID", "NIFT"] },
-  { icon: "🔬", title: "Research & Science", paths: ["Physics", "Chemistry", "Biology", "Data Science", "Astronomy"], color: "teal", exams: ["KVPY", "JEST", "IISc"] },
+  { icon: Heart, title: "Medicine & Healthcare", paths: ["MBBS", "BDS", "Nursing", "Pharmacy", "Ayurveda"], color: "green", exams: ["NEET UG", "AIIMS", "JIPMER"] },
+  { icon: Cpu, title: "Engineering & Technology", paths: ["Computer Science", "Electronics", "Mechanical", "Civil", "AI/ML"], color: "blue", exams: ["JEE Main", "JEE Advanced", "BITSAT"] },
+  { icon: Landmark, title: "Civil Services & Law", paths: ["IAS/IPS", "State PSC", "Judiciary", "Corporate Law", "LLB"], color: "purple", exams: ["UPSC CSE", "CLAT", "AILET"] },
+  { icon: Briefcase, title: "Commerce & Finance", paths: ["CA", "MBA", "Banking", "Investment", "Insurance"], color: "orange", exams: ["CAT", "CLAT", "CA Foundation"] },
+  { icon: Palette, title: "Design & Creative Arts", paths: ["Architecture", "Fashion Design", "UX/UI", "Animation", "Fine Arts"], color: "pink", exams: ["NATA", "NID", "NIFT"] },
+  { icon: Microscope, title: "Research & Science", paths: ["Physics", "Chemistry", "Biology", "Data Science", "Astronomy"], color: "teal", exams: ["KVPY", "JEST", "IISc"] },
 ];
 
 const counselors = [
@@ -124,7 +126,7 @@ export default function Career() {
                 onClick={() => toast.success(`Opening ${career.title} career path...`)}
                 className="glass-card-premium p-8 rounded-3xl hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
               >
-                <div className="text-3xl mb-3">{career.icon}</div>
+                <div className="text-3xl mb-3"><career.icon /></div>
                 <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{career.title}</h3>
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {career.paths.map((p) => (
