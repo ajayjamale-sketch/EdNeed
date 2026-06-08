@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -7,8 +9,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 
 const categories = [
   "All", "JEE / NEET", "School Curriculum", "Skill Development",
@@ -64,6 +64,7 @@ export default function Courses() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [enrollmentModalOpen, setEnrollmentModalOpen] = useState<any>(null);
   const [payModalOpen, setPayModalOpen] = useState<any>(null);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [enrollmentData, setEnrollmentData] = useState({ name: "", email: "", phone: "" });
 
   // Check login status on mount and when location changes (after redirect)
@@ -77,10 +78,9 @@ export default function Courses() {
       }
     };
     checkAuth();
-    // Listen for storage changes (in case login happens in another tab)
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
-  }, [location.key]); // re-run when URL changes (e.g., after redirect back)
+  }, [location.key]);
 
   // On mount, check if there's a pending enrollment in sessionStorage
   useEffect(() => {
@@ -89,7 +89,6 @@ export default function Courses() {
       try {
         const pendingCourse = JSON.parse(pendingCourseStr);
         sessionStorage.removeItem("pendingEnrollment");
-        // Open enrollment modal for that course
         setEnrollmentData({ name: "", email: "", phone: "" });
         setEnrollmentModalOpen(pendingCourse);
         toast.info(`Welcome back! Continue enrollment for "${pendingCourse.title}"`);
@@ -101,12 +100,10 @@ export default function Courses() {
 
   const handleEnroll = (course: any) => {
     if (!isLoggedIn) {
-      // Store the course to enroll after login/register
       sessionStorage.setItem("pendingEnrollment", JSON.stringify(course));
       toast.info("Please register to enroll in this course");
       navigate("/register");
     } else {
-      // Open enrollment form
       setEnrollmentData({ name: "", email: "", phone: "" });
       setEnrollmentModalOpen(course);
     }
@@ -120,21 +117,37 @@ export default function Courses() {
     }
     toast.success(`Welcome ${enrollmentData.name}! Enrollment details saved.`);
     setEnrollmentModalOpen(null);
-    // Now open payment modal
     setPayModalOpen(enrollmentModalOpen);
-    // Clear any leftover pending enrollment
     sessionStorage.removeItem("pendingEnrollment");
   };
 
+  // Filter courses
   const filtered = courses.filter((c) => {
     const matchCat = activeCategory === "All" || c.category === activeCategory;
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) || c.instructor.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
+  // Sort filtered courses based on sortBy
+  const sortedCourses = useMemo(() => {
+    const sorted = [...filtered];
+    switch (sortBy) {
+      case "popular":
+        return sorted.sort((a, b) => b.students - a.students);
+      case "rating":
+        return sorted.sort((a, b) => b.rating - a.rating);
+      case "newest":
+        return sorted.sort((a, b) => b.id - a.id); // assuming higher id = newer
+      case "price-low":
+        return sorted.sort((a, b) => a.price - b.price);
+      default:
+        return sorted;
+    }
+  }, [filtered, sortBy]);
+
   return (
     <Layout>
-      {/* Hero */}
+      {/* Hero section unchanged */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-secondary/5 to-background pt-28 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(221_83%_53%/0.08),_transparent_60%)]" />
         <div className="container-custom relative">
@@ -142,7 +155,6 @@ export default function Courses() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
               <BookOpen className="w-4 h-4" /> 15,000+ Courses Available
             </div>
-
             <h1 className="text-4xl lg:text-5xl font-bold font-heading mb-5 leading-tight">
               Learn Anything, <span className="gradient-text">Achieve Everything</span>
             </h1>
@@ -161,11 +173,10 @@ export default function Courses() {
                 className="w-full pl-12 pr-4 py-4 border border-border rounded-2xl bg-card shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
               />
             </div>
-            <button onClick={() => toast.info("Advanced filters coming soon")} className="px-5 py-4 border border-border rounded-2xl bg-card hover:bg-muted transition-colors flex items-center gap-2 text-sm font-medium">
+            <button onClick={() => setShowFilterModal(true)} className="px-5 py-4 border border-border rounded-2xl bg-card hover:bg-muted transition-colors flex items-center gap-2 text-sm font-medium">
               <Filter className="w-4 h-4" /> Filter
             </button>
           </div>
-          {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((s, i) => (
               <div key={i} className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
@@ -210,7 +221,7 @@ export default function Courses() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-bold">{activeCategory === "All" ? "All Courses" : activeCategory}</h2>
-              <p className="text-sm text-muted-foreground">{filtered.length} courses found</p>
+              <p className="text-sm text-muted-foreground">{sortedCourses.length} courses found</p>
             </div>
             <select
               value={sortBy}
@@ -225,7 +236,7 @@ export default function Courses() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((course) => (
+            {sortedCourses.map((course) => (
               <div
                 key={course.id}
                 className="glass-card-premium rounded-3xl overflow-hidden hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col h-full"
@@ -276,7 +287,7 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* Learning Paths (simplified placeholder – restore your original content) */}
+      {/* Learning Paths (simplified placeholder) */}
       <section className="section-padding bg-muted/30">
         <div className="container-custom text-center">
           <h2 className="text-2xl font-bold mb-2">Structured Learning Paths</h2>
@@ -366,6 +377,33 @@ export default function Courses() {
               <Button type="submit" className="bg-primary hover:bg-primary/90">Continue to Payment</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Filter Modal */}
+      <Dialog open={showFilterModal} onOpenChange={setShowFilterModal}>
+        <DialogContent className="sm:max-w-[400px] bg-background">
+          <DialogHeader>
+            <DialogTitle>Filter Courses</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-2">
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                variant={cat === activeCategory ? "default" : "outline"}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  setShowFilterModal(false);
+                }}
+                className="w-full justify-start"
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button variant="outline" onClick={() => setShowFilterModal(false)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

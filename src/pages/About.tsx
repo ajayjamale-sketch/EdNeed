@@ -146,28 +146,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="badge-blue mb-4 inline-block">Leadership</span>
-            <h2 className="text-4xl font-bold mb-4">Meet the Team <span className="gradient-text">Behind EdNeed</span></h2>
-            <p className="text-muted-foreground">Passionate educators, technologists, and problem-solvers united by one mission.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {team.map((member, i) => (
-              <div key={i} className="p-8 rounded-3xl glass-card-premium hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden group">
-                <div className={`w-20 h-20 rounded-2xl ${member.bg} flex items-center justify-center text-white text-2xl font-bold mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  {member.initials}
-                </div>
-                <h3 className="font-semibold text-base mb-0.5">{member.name}</h3>
-                <p className="text-xs font-medium text-primary mb-3">{member.role}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{member.bio}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* CTA */}
       <section className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-blue-950/10 border-t border-border">
