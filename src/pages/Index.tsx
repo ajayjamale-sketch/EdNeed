@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useId } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import {
@@ -20,36 +20,48 @@ function HeroSection() {
   const [activeUsers] = useState(125000);
   const [showDemo, setShowDemo] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const headingId = "hero-heading";
 
   useEffect(() => {
     if (localStorage.getItem("edneed-user")) setIsLoggedIn(true);
   }, []);
 
   return (
-    <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-8 pb-16">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50/40 to-emerald-50/30 dark:from-slate-950 dark:via-blue-950/20 dark:to-purple-950/10" />
-      <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-blue-400/10 rounded-full blur-[120px] -translate-x-1/2" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-400/10 rounded-full blur-[100px] translate-x-1/4" />
+    <section
+      aria-labelledby={headingId}
+      className="relative min-h-[92vh] flex items-center overflow-hidden pt-8 pb-16"
+    >
+      {/* Decorative backgrounds — hidden from assistive tech */}
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50/40 to-emerald-50/30 dark:from-slate-950 dark:via-blue-950/20 dark:to-purple-950/10" />
+      <div aria-hidden="true" className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-blue-400/10 rounded-full blur-[120px] -translate-x-1/2" />
+      <div aria-hidden="true" className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-400/10 rounded-full blur-[100px] translate-x-1/4" />
 
       <div className="container-custom relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-6 border border-primary/20">
-              <Zap className="w-3.5 h-3.5" />
+            <div
+              aria-hidden="true"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-6 border border-primary/20"
+            >
+              <Zap className="w-3.5 h-3.5" aria-hidden="true" />
               AI-Powered Learning Platform · Trusted by {activeUsers.toLocaleString()}+ Students
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-balance mb-6">
+
+            <h1
+              id={headingId}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-balance mb-6"
+            >
               Learn Smarter,{" "}
               <span className="gradient-text">Achieve More</span>
             </h1>
+
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
               EdNeed connects students, parents, teachers, and institutions through an AI-powered ecosystem for personalized learning, assessments, career guidance, and academic excellence.
             </p>
 
             {/* Stats row */}
-            <div className="flex items-center justify-center lg:justify-start gap-6 mb-8">
+            <dl className="flex items-center justify-center lg:justify-start gap-6 mb-8" aria-label="Platform statistics">
               {[
                 { val: "500K+", label: "Students" },
                 { val: "15K+", label: "Courses" },
@@ -57,48 +69,49 @@ function HeroSection() {
                 { val: "98%", label: "Satisfaction" },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <div className="text-xl font-bold gradient-text">{s.val}</div>
-                  <div className="text-xs text-muted-foreground">{s.label}</div>
+                  <dd className="text-xl font-bold gradient-text">{s.val}</dd>
+                  <dt className="text-xs text-muted-foreground">{s.label}</dt>
                 </div>
               ))}
-            </div>
+            </dl>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <Link
                 to={isLoggedIn ? "/dashboard" : "/register"}
-                className="w-full sm:w-auto px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold text-base hover:opacity-90 transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 group"
+                className="w-full sm:w-auto px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold text-base hover:opacity-90 transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 {isLoggedIn ? "Go to Dashboard" : "Start Learning Free"}
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
               </Link>
               <button
                 onClick={() => setShowDemo(true)}
-                className="w-full sm:w-auto px-7 py-3.5 bg-background border border-border rounded-xl font-semibold text-base hover:bg-muted transition-all flex items-center justify-center gap-2 shadow-sm"
+                aria-haspopup="dialog"
+                className="w-full sm:w-auto px-7 py-3.5 bg-background border border-border rounded-xl font-semibold text-base hover:bg-muted transition-all flex items-center justify-center gap-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
-                <Play className="w-4 h-4 text-primary" />
+                <Play className="w-4 h-4 text-primary" aria-hidden="true" />
                 Watch Demo
               </button>
             </div>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-6">
+            <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-6 list-none" aria-label="Trust indicators">
               {["No credit card required", "CBSE & ICSE aligned", "AI-powered"].map((t) => (
-                <span key={t} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <CheckCircle className="w-3.5 h-3.5 text-accent" />
+                <li key={t} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <CheckCircle className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
                   {t}
-                </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           {/* Right – Hero Image + floating cards */}
-          <div className="relative hidden lg:block">
+          <div className="relative hidden lg:block" aria-hidden="true">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-border/50">
-              <img src={heroImg} alt="EdNeed platform" className="w-full object-cover" />
+              <img src={heroImg} alt="" role="presentation" className="w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
             </div>
 
-            {/* Floating cards */}
+            {/* Floating cards — decorative */}
             <div className="absolute -left-10 top-16 glass-card rounded-xl p-3.5 shadow-lg animate-float">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -132,6 +145,7 @@ function HeroSection() {
           </div>
         </div>
       </div>
+
       <DemoModal
         isOpen={showDemo}
         onClose={() => setShowDemo(false)}
@@ -161,12 +175,14 @@ const colorMap: Record<string, string> = {
 };
 
 function FeaturesSection() {
+  const headingId = "features-heading";
+
   return (
-    <section id="features" className="section-padding bg-background">
+    <section id="features" aria-labelledby={headingId} className="section-padding bg-background">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="badge-blue mb-4 inline-block">All-in-One Platform</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-4">
             Everything You Need to <span className="gradient-text">Excel Academically</span>
           </h2>
           <p className="text-muted-foreground text-lg">
@@ -174,24 +190,30 @@ function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 list-none">
           {features.map((f, i) => (
-            <div
+            <li
               key={i}
-              className="p-6 rounded-2xl border border-border bg-card card-hover group cursor-pointer"
+              className="p-6 rounded-2xl border border-border bg-card card-hover group cursor-default"
             >
-              <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110", colorMap[f.color])}>
+              <div
+                className={cn("w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110", colorMap[f.color])}
+                aria-hidden="true"
+              >
                 <f.icon className="w-5.5 h-5.5" />
               </div>
               <h3 className="font-semibold text-base mb-2">{f.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <div className="text-center mt-10">
-          <Link to="/features" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-            View all features <ArrowRight className="w-4 h-4" />
+          <Link
+            to="/features"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+          >
+            View all features <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
       </div>
@@ -208,13 +230,15 @@ const steps = [
 ];
 
 function WorkflowSection() {
+  const headingId = "workflow-heading";
+
   return (
-    <section className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-blue-950/10">
+    <section aria-labelledby={headingId} className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-blue-950/10">
       <div className="container-custom">
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           <div>
             <span className="badge-blue mb-4 inline-block">How It Works</span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-5">
+            <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-5">
               Your Journey to <span className="gradient-text">Academic Excellence</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
@@ -222,28 +246,31 @@ function WorkflowSection() {
             </p>
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
+              className="inline-flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              Start Your Journey <ArrowRight className="w-4 h-4" />
+              Start Your Journey <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="space-y-5">
+          <ol className="space-y-5 list-none">
             {steps.map((step, i) => (
-              <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors group">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white font-bold text-sm shadow-md shadow-primary/25">
+              <li key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors group">
+                <div
+                  className="flex-shrink-0 w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white font-bold text-sm shadow-md shadow-primary/25"
+                  aria-hidden="true"
+                >
                   {step.num}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base mb-1 flex items-center gap-2">
                     {step.title}
-                    <step.icon className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <step.icon className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
     </section>
@@ -280,13 +307,16 @@ const userTypes = [
 
 function BenefitsSection() {
   const [active, setActive] = useState(0);
+  const headingId = "benefits-heading";
+  const tabListId = "benefits-tablist";
+  const panelId = "benefits-panel";
 
   return (
-    <section className="section-padding bg-background">
+    <section aria-labelledby={headingId} className="section-padding bg-background">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="badge-blue mb-4 inline-block">Built for Everyone</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-4">
             One Platform, <span className="gradient-text">Every Role</span>
           </h2>
           <p className="text-muted-foreground text-lg">
@@ -295,42 +325,62 @@ function BenefitsSection() {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div
+          role="tablist"
+          id={tabListId}
+          aria-label="User role benefits"
+          className="flex flex-wrap justify-center gap-2 mb-10"
+        >
           {userTypes.map((u, i) => {
             const Icon = u.icon;
+            const isActive = active === i;
             return (
               <button
                 key={i}
+                role="tab"
+                id={`benefits-tab-${i}`}
+                aria-selected={isActive}
+                aria-controls={panelId}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => setActive(i)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowRight") setActive((prev) => (prev + 1) % userTypes.length);
+                  if (e.key === "ArrowLeft") setActive((prev) => (prev - 1 + userTypes.length) % userTypes.length);
+                }}
                 className={cn(
-                  "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border flex items-center gap-2",
-                  active === i
+                  "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+                  isActive
                     ? "gradient-primary text-white border-transparent shadow-md shadow-primary/20"
                     : "bg-muted border-transparent hover:border-border text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="w-4 h-4" /> {u.role}
+                <Icon className="w-4 h-4" aria-hidden="true" /> {u.role}
               </button>
             );
           })}
         </div>
 
-        {/* Content */}
-        <div className="max-w-3xl mx-auto">
-          <div className="grid sm:grid-cols-2 gap-4">
+        {/* Tab Panel */}
+        <div
+          id={panelId}
+          role="tabpanel"
+          aria-labelledby={`benefits-tab-${active}`}
+          className="max-w-3xl mx-auto"
+        >
+          <ul className="grid sm:grid-cols-2 gap-4 list-none" aria-label={`Benefits for ${userTypes[active].role}`}>
             {userTypes[active].benefits.map((b, i) => (
-              <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors">
-                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
+              <li key={i} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors">
+                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" aria-hidden="true" />
                 <span className="text-sm font-medium">{b}</span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
           <div className="text-center mt-6">
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 shadow-lg shadow-primary/25"
+              className="inline-flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 shadow-lg shadow-primary/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              Get Started as {userTypes[active].role} <ArrowRight className="w-4 h-4" />
+              Get Started as {userTypes[active].role} <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -341,18 +391,20 @@ function BenefitsSection() {
 
 // ─── Dashboard Preview Section ─────────────────────────────────────
 function DashboardPreviewSection() {
+  const headingId = "dashboard-preview-heading";
+
   return (
-    <section className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.06),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.15),_transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.05),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.12),_transparent_60%)]" />
+    <section aria-labelledby={headingId} className="section-padding bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950 relative overflow-hidden">
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.06),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.15),_transparent_60%)]" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.05),_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_bottom_right,_rgba(124,58,237,0.12),_transparent_60%)]" />
 
       <div className="container-custom relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary dark:bg-white/10 dark:text-white rounded-full text-sm font-semibold mb-4 border border-primary/20 dark:border-white/20">
-            <BarChart3 className="w-3.5 h-3.5" />
+            <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
             Live Analytics Dashboard
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Track Every Step of Your <span className="gradient-text">Learning Journey</span>
           </h2>
           <p className="text-muted-foreground text-lg">
@@ -360,15 +412,16 @@ function DashboardPreviewSection() {
           </p>
         </div>
 
-        {/* Mock Dashboard UI */}
-        <div className="bg-card border border-border rounded-2xl p-5 backdrop-blur-sm shadow-2xl">
+        {/* Mock Dashboard UI — aria-hidden since it's a purely visual demo */}
+        <figure aria-label="Sample student dashboard preview" className="bg-card border border-border rounded-2xl p-5 backdrop-blur-sm shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-border">
             <div>
               <h3 className="text-foreground font-semibold">Student Dashboard</h3>
               <p className="text-muted-foreground text-xs mt-0.5">Welcome back, Alex! 3 tasks pending</p>
             </div>
-            <div className="flex gap-2">
+            {/* Window chrome dots — decorative */}
+            <div className="flex gap-2" aria-hidden="true">
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
@@ -376,7 +429,7 @@ function DashboardPreviewSection() {
           </div>
 
           {/* Stats grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
             {[
               { label: "Courses Enrolled", val: "12", change: "+2", color: "blue" },
               { label: "Hours Studied", val: "247", change: "+18h", color: "purple" },
@@ -384,12 +437,12 @@ function DashboardPreviewSection() {
               { label: "Avg. Score", val: "82%", change: "+4%", color: "orange" },
             ].map((s, i) => (
               <div key={i} className="bg-muted/50 rounded-xl p-4 border border-border">
-                <div className="text-muted-foreground text-xs mb-1">{s.label}</div>
-                <div className="text-foreground text-2xl font-bold">{s.val}</div>
-                <div className="text-emerald-500 dark:text-emerald-400 text-xs mt-1 font-medium">{s.change} this week</div>
+                <dt className="text-muted-foreground text-xs mb-1">{s.label}</dt>
+                <dd className="text-foreground text-2xl font-bold">{s.val}</dd>
+                <p className="text-emerald-500 dark:text-emerald-400 text-xs mt-1 font-medium">{s.change} this week</p>
               </div>
             ))}
-          </div>
+          </dl>
 
           {/* Progress bars */}
           <div className="grid md:grid-cols-2 gap-5">
@@ -406,7 +459,14 @@ function DashboardPreviewSection() {
                     <span className="text-foreground">{s.sub}</span>
                     <span className="text-muted-foreground">{s.pct}%</span>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-2 bg-muted rounded-full overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={s.pct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${s.sub} progress`}
+                  >
                     <div className={cn("h-full rounded-full transition-all", s.color)} style={{ width: `${s.pct}%` }} />
                   </div>
                 </div>
@@ -415,36 +475,40 @@ function DashboardPreviewSection() {
 
             <div className="bg-muted/50 rounded-xl p-4 border border-border">
               <h4 className="text-foreground text-sm font-semibold mb-4">Upcoming Schedule</h4>
-              {[
-                { title: "Calculus — Live Class", time: "Today, 4:00 PM", status: "Soon" },
-                { title: "Physics Mock Test", time: "Tomorrow, 10:00 AM", status: "Scheduled" },
-                { title: "Chemistry Assignment", time: "Thu, 11:59 PM", status: "Due" },
-                { title: "English Group Discussion", time: "Fri, 3:00 PM", status: "Scheduled" },
-              ].map((e, i) => (
-                <div key={i} className="flex items-center justify-between mb-3 last:mb-0">
-                  <div>
-                    <div className="text-foreground text-xs font-medium">{e.title}</div>
-                    <div className="text-muted-foreground text-xs mt-0.5">{e.time}</div>
-                  </div>
-                  <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", {
-                    "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400": e.status === "Soon",
-                    "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400": e.status === "Scheduled",
-                    "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400": e.status === "Due",
-                  })}>
-                    {e.status}
-                  </span>
-                </div>
-              ))}
+              <ul className="space-y-3 list-none">
+                {[
+                  { title: "Calculus — Live Class", time: "Today, 4:00 PM", status: "Soon" },
+                  { title: "Physics Mock Test", time: "Tomorrow, 10:00 AM", status: "Scheduled" },
+                  { title: "Chemistry Assignment", time: "Thu, 11:59 PM", status: "Due" },
+                  { title: "English Group Discussion", time: "Fri, 3:00 PM", status: "Scheduled" },
+                ].map((e, i) => (
+                  <li key={i} className="flex items-center justify-between">
+                    <div>
+                      <div className="text-foreground text-xs font-medium">{e.title}</div>
+                      <div className="text-muted-foreground text-xs mt-0.5">
+                        <time>{e.time}</time>
+                      </div>
+                    </div>
+                    <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", {
+                      "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400": e.status === "Soon",
+                      "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400": e.status === "Scheduled",
+                      "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400": e.status === "Due",
+                    })}>
+                      {e.status}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </div>
+        </figure>
 
         <div className="text-center mt-8">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-2 px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
+            className="inline-flex items-center gap-2 px-7 py-3.5 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            Explore Dashboard <ArrowRight className="w-4 h-4" />
+            Explore Dashboard <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
       </div>
@@ -454,17 +518,19 @@ function DashboardPreviewSection() {
 
 // ─── Global Reach Section ─────────────────────────────────────────
 function GlobalReachSection() {
+  const headingId = "global-reach-heading";
+
   return (
-    <section className="section-padding bg-background border-t border-b border-border overflow-hidden">
+    <section aria-labelledby={headingId} className="section-padding bg-background border-t border-b border-border overflow-hidden">
       <div className="container-custom">
         <div className="grid lg:grid-cols-2 gap-14 items-center">
-          <div className="order-2 lg:order-1 relative">
+          {/* Globe visualization — decorative */}
+          <div className="order-2 lg:order-1 relative" aria-hidden="true">
             <div className="relative aspect-square max-w-md mx-auto lg:mx-0">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full animate-pulse-slow" />
               <div className="absolute inset-4 bg-card border border-border rounded-full glass-card-premium flex items-center justify-center p-8">
                 <div className="relative w-full h-full">
                   <Globe className="absolute inset-0 w-full h-full text-primary/10" />
-                  {/* Floating dots representing institutions */}
                   {[
                     { top: "20%", left: "30%", delay: "0s" },
                     { top: "40%", left: "70%", delay: "1s" },
@@ -487,31 +553,34 @@ function GlobalReachSection() {
               </div>
             </div>
           </div>
-          
+
           <div className="order-1 lg:order-2">
             <span className="badge-blue mb-4 inline-block">Global Network</span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-5">
+            <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-5">
               Trusted by <span className="gradient-text">Top Institutions</span> Worldwide
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
               EdNeed powers the digital infrastructure for schools, colleges, and educational organizations across the globe, ensuring uninterrupted and premium learning experiences.
             </p>
-            
-            <div className="grid grid-cols-2 gap-6 mb-8">
+
+            <dl className="grid grid-cols-2 gap-6 mb-8">
               <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-card">
-                <Building2 className="w-8 h-8 text-primary mb-2" />
-                <div className="text-3xl font-bold">500+</div>
-                <div className="text-sm text-muted-foreground">Partner Schools</div>
+                <Building2 className="w-8 h-8 text-primary mb-2" aria-hidden="true" />
+                <dd className="text-3xl font-bold">500+</dd>
+                <dt className="text-sm text-muted-foreground">Partner Schools</dt>
               </div>
               <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-card">
-                <MapPin className="w-8 h-8 text-secondary mb-2" />
-                <div className="text-3xl font-bold">12</div>
-                <div className="text-sm text-muted-foreground">Countries</div>
+                <MapPin className="w-8 h-8 text-secondary mb-2" aria-hidden="true" />
+                <dd className="text-3xl font-bold">12</dd>
+                <dt className="text-sm text-muted-foreground">Countries</dt>
               </div>
-            </div>
-            
-            <Link to="/about" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-              Read about our mission <ArrowRight className="w-4 h-4" />
+            </dl>
+
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+            >
+              Read about our mission <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -531,42 +600,49 @@ const testimonials = [
 ];
 
 function TestimonialsSection() {
+  const headingId = "testimonials-heading";
+
   return (
-    <section className="section-padding bg-background">
+    <section aria-labelledby={headingId} className="section-padding bg-background">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="badge-blue mb-4 inline-block">Success Stories</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-4">
             Loved by <span className="gradient-text">Students & Educators</span>
           </h2>
           <p className="text-muted-foreground text-lg">Real experiences from students, teachers, parents, and institutions across India.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 list-none">
           {testimonials.map((t, i) => (
-            <div key={i} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/20 transition-colors card-hover">
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
+            <li key={i} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/20 transition-colors card-hover">
+              {/* Star rating */}
+              <div className="flex gap-1 mb-4" aria-label={`Rated ${t.rating} out of 5 stars`}>
                 {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <Star key={j} className="w-4 h-4 text-yellow-500 fill-yellow-500" aria-hidden="true" />
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-5">"{t.text}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                  {t.avatar}
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            </div>
+              <blockquote>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5">"{t.text}"</p>
+                <footer className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                    aria-hidden="true"
+                  >
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <cite className="not-italic font-semibold text-sm block">{t.name}</cite>
+                    <span className="text-xs text-muted-foreground">{t.role}</span>
+                  </div>
+                </footer>
+              </blockquote>
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Rating summary */}
-        <div className="flex flex-wrap justify-center gap-8 mt-12 pt-10 border-t border-border">
+        <dl className="flex flex-wrap justify-center gap-8 mt-12 pt-10 border-t border-border" aria-label="Overall ratings summary">
           {[
             { val: "4.9/5", label: "Average Rating" },
             { val: "50,000+", label: "Reviews" },
@@ -574,11 +650,11 @@ function TestimonialsSection() {
             { val: "#1", label: "EdTech Platform India" },
           ].map((s, i) => (
             <div key={i} className="text-center">
-              <div className="text-3xl font-bold gradient-text">{s.val}</div>
-              <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
+              <dd className="text-3xl font-bold gradient-text">{s.val}</dd>
+              <dt className="text-sm text-muted-foreground mt-1">{s.label}</dt>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );
@@ -617,8 +693,9 @@ function PricingSection() {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const headingId = "pricing-heading";
+  const toggleId = "billing-toggle";
 
-  // Read real auth state from localStorage (same pattern as rest of the app)
   const isLoggedIn = (() => {
     try {
       const stored = localStorage.getItem("edneed-user");
@@ -644,34 +721,49 @@ function PricingSection() {
   };
 
   return (
-    <section id="pricing" className="section-padding bg-gradient-to-b from-slate-50/50 to-background dark:from-slate-950/50">
+    <section id="pricing" aria-labelledby={headingId} className="section-padding bg-gradient-to-b from-slate-50/50 to-background dark:from-slate-950/50">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="badge-blue mb-4 inline-block">Simple Pricing</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-4">
             Plans for Every <span className="gradient-text">Learner</span>
           </h2>
           <p className="text-muted-foreground text-lg mb-8">Start free, scale as you grow. No hidden fees.</p>
 
-          {/* Toggle */}
+          {/* Billing toggle */}
           <div className="flex items-center justify-center gap-3 mt-6">
-            <span className={cn("text-sm font-medium", !annual && "text-foreground")}>Monthly</span>
-            <button
-              onClick={() => setAnnual(!annual)}
-              className={cn("relative w-12 h-6 rounded-full transition-colors", annual ? "bg-primary" : "bg-muted")}
+            <span
+              id="billing-monthly-label"
+              className={cn("text-sm font-medium", !annual && "text-foreground")}
+              aria-hidden="true"
             >
-              <span className={cn("absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform", annual && "translate-x-6")} />
+              Monthly
+            </span>
+            <button
+              id={toggleId}
+              role="switch"
+              aria-checked={annual}
+              aria-label={`Billing cycle: ${annual ? "Annual" : "Monthly"}`}
+              onClick={() => setAnnual(!annual)}
+              className={cn("relative w-12 h-6 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary", annual ? "bg-primary" : "bg-muted")}
+            >
+              <span className={cn("absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform", annual && "translate-x-6")} aria-hidden="true" />
             </button>
-            <span className={cn("text-sm font-medium", annual && "text-foreground")}>
+            <span
+              id="billing-annual-label"
+              className={cn("text-sm font-medium", annual && "text-foreground")}
+              aria-hidden="true"
+            >
               Annual <span className="text-accent font-semibold text-xs ml-1">Save 20%</span>
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto" role="list" aria-label="Pricing plans">
           {plans.map((plan, i) => (
             <div
               key={i}
+              role="listitem"
               className={cn(
                 "rounded-2xl p-7 border transition-all relative",
                 plan.popular
@@ -680,7 +772,10 @@ function PricingSection() {
               )}
             >
               {plan.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1 rounded-full">
+                <div
+                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1 rounded-full"
+                  aria-label="Most popular plan"
+                >
                   Most Popular
                 </div>
               )}
@@ -696,18 +791,19 @@ function PricingSection() {
                   <span className={cn("text-sm ml-1", plan.popular ? "text-white/70" : "text-muted-foreground")}>/month</span>
                 )}
               </div>
-              <ul className="space-y-3 mb-7">
+              <ul className="space-y-3 mb-7 list-none" aria-label={`${plan.name} plan features`}>
                 {plan.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-2.5 text-sm">
-                    <CheckCircle className={cn("w-4 h-4 flex-shrink-0", plan.popular ? "text-white/80" : "text-accent")} />
+                    <CheckCircle className={cn("w-4 h-4 flex-shrink-0", plan.popular ? "text-white/80" : "text-accent")} aria-hidden="true" />
                     <span className={plan.popular ? "text-white/90" : ""}>{f}</span>
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handlePlanSelect(plan)}
+                aria-label={`Select ${plan.name} plan — ₹${annual ? plan.price.annual : plan.price.monthly}${plan.price.monthly > 0 ? "/month" : ""}`}
                 className={cn(
-                  "block w-full py-3 rounded-xl text-center text-sm font-semibold transition-all",
+                  "block w-full py-3 rounded-xl text-center text-sm font-semibold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
                   plan.popular
                     ? "bg-white text-primary hover:bg-white/90"
                     : "gradient-primary text-white hover:opacity-90 shadow-md shadow-primary/20"
@@ -726,22 +822,22 @@ function PricingSection() {
 
       {/* Payment Modal */}
       <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
-        <DialogContent className="sm:max-w-[400px] bg-background">
+        <DialogContent className="sm:max-w-[400px] bg-background" aria-describedby="payment-modal-desc">
           <DialogHeader>
             <DialogTitle>Complete Subscription</DialogTitle>
           </DialogHeader>
           <div className="py-4 text-center">
-            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
               <CheckCircle className="w-8 h-8" />
             </div>
             <h3 className="font-bold text-2xl mb-1 text-foreground">
               ₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}
               <span className="text-sm font-medium text-muted-foreground">/{annual ? 'year' : 'month'}</span>
             </h3>
-            <p className="text-sm font-semibold mb-1 text-foreground">{selectedPlan?.name} Plan</p>
+            <p id="payment-modal-desc" className="text-sm font-semibold mb-1 text-foreground">{selectedPlan?.name} Plan</p>
             <p className="text-xs text-muted-foreground mb-4">{annual ? "Billed annually" : "Billed monthly"}</p>
 
-            <div className="text-left bg-muted p-4 rounded-xl mb-4">
+            <div className="text-left bg-muted p-4 rounded-xl mb-4" aria-label="Order summary">
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-muted-foreground">Plan Cost</span>
                 <span className="font-medium">₹{annual ? selectedPlan?.price.annual : selectedPlan?.price.monthly}</span>
@@ -758,21 +854,26 @@ function PricingSection() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <p className="text-xs font-medium text-left mb-2">Select Payment Method</p>
-              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer bg-primary/5 border-primary/30">
-                <div className="w-4 h-4 rounded-full border-[5px] border-primary flex-shrink-0" />
+            <fieldset className="space-y-3">
+              <legend className="text-xs font-medium text-left mb-2">Select Payment Method</legend>
+              <label className="flex items-center gap-3 p-3 border border-primary/30 rounded-xl cursor-pointer bg-primary/5">
+                <input type="radio" name="payment-method" value="card" defaultChecked className="sr-only" />
+                <div className="w-4 h-4 rounded-full border-[5px] border-primary flex-shrink-0" aria-hidden="true" />
                 <span className="text-sm font-semibold">Credit/Debit Card</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50">
-                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" />
+              </label>
+              <label className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50">
+                <input type="radio" name="payment-method" value="upi" className="sr-only" />
+                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" aria-hidden="true" />
                 <span className="text-sm font-medium text-muted-foreground">UPI / Google Pay</span>
-              </div>
-            </div>
+              </label>
+            </fieldset>
           </div>
           <DialogFooter className="sm:justify-center">
             <Button variant="outline" onClick={() => setSelectedPlan(null)}>Cancel</Button>
-            <Button onClick={() => { toast.success(`Successfully subscribed to ${selectedPlan.name} plan!`); setSelectedPlan(null); }} className="bg-primary hover:bg-primary/90 text-white w-full">
+            <Button
+              onClick={() => { toast.success(`Successfully subscribed to ${selectedPlan.name} plan!`); setSelectedPlan(null); }}
+              className="bg-primary hover:bg-primary/90 text-white w-full"
+            >
               Subscribe Now
             </Button>
           </DialogFooter>
@@ -794,40 +895,63 @@ const faqs = [
 
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
+  const headingId = "faq-heading";
 
   return (
-    <section className="section-padding bg-background">
+    <section aria-labelledby={headingId} className="section-padding bg-background">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="badge-blue mb-4 inline-block">Frequently Asked</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 id={headingId} className="text-4xl md:text-5xl font-bold mb-4">
             Got <span className="gradient-text">Questions?</span>
           </h2>
           <p className="text-muted-foreground text-lg">Everything you need to know about EdNeed.</p>
         </div>
 
-        <div className="max-w-2xl mx-auto space-y-3">
-          {faqs.map((faq, i) => (
-            <div key={i} className="border border-border rounded-xl overflow-hidden">
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/50 transition-colors"
-              >
-                <span className="font-medium text-sm pr-4">{faq.q}</span>
-                {open === i ? <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-              </button>
-              {open === i && (
-                <div className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-3 bg-muted/20">
+        <dl className="max-w-2xl mx-auto space-y-3">
+          {faqs.map((faq, i) => {
+            const isOpen = open === i;
+            const answerId = `faq-answer-${i}`;
+            const questionId = `faq-question-${i}`;
+            return (
+              <div key={i} className="border border-border rounded-xl overflow-hidden">
+                <dt>
+                  <button
+                    id={questionId}
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+                  >
+                    <span className="font-medium text-sm pr-4">{faq.q}</span>
+                    {isOpen
+                      ? <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" aria-hidden="true" />
+                      : <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" aria-hidden="true" />
+                    }
+                  </button>
+                </dt>
+                <dd
+                  id={answerId}
+                  role="region"
+                  aria-labelledby={questionId}
+                  hidden={!isOpen}
+                  className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-3 bg-muted/20"
+                >
                   {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
 
         <p className="text-center text-sm text-muted-foreground mt-8">
           Still have questions?{" "}
-          <Link to="/contact" className="text-primary font-semibold hover:underline">Contact our team</Link>
+          <Link
+            to="/contact"
+            className="text-primary font-semibold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+          >
+            Contact our team
+          </Link>
         </p>
       </div>
     </section>
@@ -836,19 +960,21 @@ function FAQSection() {
 
 // ─── CTA Banner Section ───────────────────────────────────────────
 function CTASection() {
+  const headingId = "cta-heading";
+
   return (
-    <section className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 gradient-primary opacity-95" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1),_transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.1),_transparent_60%)]" />
+    <section aria-labelledby={headingId} className="section-padding relative overflow-hidden">
+      <div aria-hidden="true" className="absolute inset-0 gradient-primary opacity-95" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1),_transparent_60%)]" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.1),_transparent_60%)]" />
 
       <div className="container-custom relative z-10 text-center">
         <div className="max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-full text-sm font-semibold mb-6 border border-white/30">
-            <Zap className="w-3.5 h-3.5" />
+            <Zap className="w-3.5 h-3.5" aria-hidden="true" />
             Join 500,000+ Learners Today
           </span>
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-5 text-balance leading-tight">
+          <h2 id={headingId} className="text-4xl md:text-6xl font-bold text-white mb-5 text-balance leading-tight">
             Ready to Transform Your Educational Journey?
           </h2>
           <p className="text-xl text-white/80 mb-10 leading-relaxed">
@@ -857,30 +983,30 @@ function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/register"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-primary rounded-xl font-bold text-base hover:bg-white/95 transition-colors shadow-xl flex items-center justify-center gap-2 group"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-primary rounded-xl font-bold text-base hover:bg-white/95 transition-colors shadow-xl flex items-center justify-center gap-2 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Get Started for Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
             </Link>
             <Link
               to="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-white/15 text-white border border-white/30 rounded-xl font-semibold text-base hover:bg-white/25 transition-colors backdrop-blur-sm flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-white/15 text-white border border-white/30 rounded-xl font-semibold text-base hover:bg-white/25 transition-colors backdrop-blur-sm flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Schedule a Demo
             </Link>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
+          <ul className="flex flex-wrap items-center justify-center gap-6 mt-8 list-none" aria-label="Additional assurances">
             {[
               { icon: Shield, text: "100% Safe & Secure" },
               { icon: Clock, text: "Available 24/7" },
               { icon: Globe, text: "Access Anywhere" },
             ].map(({ icon: Icon, text }) => (
-              <span key={text} className="flex items-center gap-2 text-sm text-white/75">
-                <Icon className="w-4 h-4" />
+              <li key={text} className="flex items-center gap-2 text-sm text-white/75">
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 {text}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>
@@ -891,16 +1017,18 @@ function CTASection() {
 export default function Index() {
   return (
     <Layout>
-      <HeroSection />
-      <FeaturesSection />
-      <WorkflowSection />
-      <BenefitsSection />
-      <DashboardPreviewSection />
-      <GlobalReachSection />
-      <TestimonialsSection />
-      <PricingSection />
-      <FAQSection />
-      <CTASection />
+      <main id="main-content">
+        <HeroSection />
+        <FeaturesSection />
+        <WorkflowSection />
+        <BenefitsSection />
+        <DashboardPreviewSection />
+        <GlobalReachSection />
+        <TestimonialsSection />
+        <PricingSection />
+        <FAQSection />
+        <CTASection />
+      </main>
     </Layout>
   );
 }

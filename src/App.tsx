@@ -22,6 +22,7 @@ import BlogPost from "./pages/BlogPost";
 import FAQ from "./pages/FAQ";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import AccessibilityPage from "./pages/Accessibility";
 import NotFound from "./pages/NotFound";
 import RoleSelect from "./pages/RoleSelect";
 import Courses from "./pages/Courses";
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/accessibility" element={<AccessibilityPage />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/tutors" element={<TutorsPage />} />
             <Route path="/career" element={<Career />} />
